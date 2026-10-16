@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="بث">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>بث</title>
+<style>
+/* App Store–style shell: large-title pages, rounded cards, 3-row shelves, blurred tab bar */
+:root{
+  --bg:#ffffff; --bg2:#f2f2f7; --card:#ffffff; --tile:#f2f2f7;
+  --fg:#000000; --fg2:rgba(60,60,67,.62); --fg3:rgba(60,60,67,.32);
+  --sep:rgba(60,60,67,.2); --fill:rgba(118,118,128,.12);
+  --accent:#007aff; --bar:rgba(249,249,249,.88); --shadow:rgba(0,0,0,.14);
+  --font:-apple-system,BlinkMacSystemFont,"SF Arabic","SF Pro Text","Geeza Pro","Segoe UI",system-ui,sans-serif;
+  --round:ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#000000; --bg2:#000000; --card:#1c1c1e; --tile:#2c2c2e;
+  --fg:#ffffff; --fg2:rgba(235,235,245,.6); --fg3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24);
+  --accent:#0a84ff; --bar:rgba(18,18,18,.86); --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font:17px/1.35 var(--font);-webkit-font-smoothing:antialiased;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));overscroll-behavior-y:none}
+button,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.page{max-width:760px;margin:0 auto;padding-top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:24px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.page.sub{padding-top:10px}
+.stack{display:flex;flex-direction:column;gap:30px}
+.date{font-size:13px;font-weight:600;color:var(--fg2)}
+.h1{font-size:34px;font-weight:800;margin:0;line-height:1.15;text-wrap:balance}
+.h2{font-size:22px;font-weight:700;margin:0;text-wrap:balance}
+.muted{color:var(--fg2)}
+.th{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.avatar{width:38px;height:38px;color:var(--accent)}
+.avatar svg{width:38px;height:38px}
+hr{border:0;height:.5px;background:var(--sep);margin:0}
+
+/* logos */
+.logo{--s:60px;width:var(--s);height:var(--s);border-radius:calc(var(--s)*.225);position:relative;overflow:hidden;flex:none;display:grid;place-items:center;box-shadow:inset 0 0 0 .5px var(--sep)}
+.logo span{color:#fff;font:700 calc(var(--s)*.3)/1 var(--round);padding:3px;text-align:center;overflow:hidden;max-width:100%}
+.logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:14%;opacity:0;transition:opacity .25s}
+.logo.ok{background:var(--tile)!important}
+.logo.ok img{opacity:1}
+.logo.ok span{visibility:hidden}
+
+/* rows */
+.row{display:flex;align-items:center;gap:14px;padding:8px 0;position:relative;cursor:pointer;min-width:0}
+.row .meta{flex:1;min-width:0}
+.name{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:14px;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.div::after{content:"";position:absolute;bottom:0;inset-inline-start:74px;inset-inline-end:0;height:.5px;background:var(--sep)}
+.get{background:var(--fill);color:var(--accent);font-weight:700;font-size:15px;padding:6px 18px;border-radius:999px;flex:none;transition:transform .15s}
+.get:active,.press:active{transform:scale(.96)}
+.get.big{background:var(--accent);color:#fff;padding:7px 30px}
+
+/* today cards */
+.feature{position:relative;display:block;height:430px;border-radius:24px;overflow:hidden;box-shadow:0 14px 34px var(--shadow);color:#fff;cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.feature:active{transform:scale(.97)}
+.mosaic{position:absolute;inset:-40% -30%;display:grid;grid-template-columns:repeat(4,72px);gap:14px;justify-content:center;align-content:center;transform:rotate(-14deg) scale(1.3) translateY(70px)}
+.mosaic.sm{grid-template-columns:repeat(4,58px);transform:rotate(-12deg) scale(1.25)}
+.shade{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.5),transparent 38%,transparent 62%,rgba(0,0,0,.32))}
+.ftxt{position:absolute;top:0;left:0;right:0;padding:20px}
+.eyebrow{font-size:13px;font-weight:700;opacity:.78}
+.feature h3{font-size:30px;font-weight:850;margin:4px 0 2px;line-height:1.12;text-wrap:balance}
+.foot{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(28,28,30,.42);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6)}
+.foot .meta{flex:1;min-width:0}
+.foot .sub{color:rgba(255,255,255,.7);font-size:13px}
+.ghost{background:rgba(255,255,255,.25);padding:6px 18px;border-radius:999px;font-weight:700;font-size:15px}
+.lcard{background:var(--card);border-radius:24px;padding:20px;box-shadow:0 10px 30px var(--shadow)}
+.lcard .eyebrow{color:var(--fg2);opacity:1}
+.lcard .h2{margin-bottom:6px}
+.welcome{border-radius:24px;padding:24px;min-height:420px;display:flex;flex-direction:column;gap:12px;color:#fff;background:linear-gradient(140deg,#5c45f2,#007aff);box-shadow:0 14px 34px var(--shadow)}
+.welcome h3{font-size:30px;font-weight:850;margin:0}
+.welcome p{margin:0;opacity:.88;font-size:15px;max-width:34ch}
+.welcome .cta{margin-top:auto;align-self:flex-start;background:#fff;color:#007aff;font-weight:700;padding:12px 22px;border-radius:999px}
+.spin{width:28px;height:28px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* browse */
+.bleed{margin-left:calc(-1 * max(20px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(20px,env(safe-area-inset-right,0px)));padding-inline:max(20px,env(safe-area-inset-left,0px));scroll-padding-inline:max(20px,env(safe-area-inset-left,0px))}
+.hscroll{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.hscroll::-webkit-scrollbar{display:none}
+.banners{display:grid;grid-auto-flow:column;grid-auto-columns:88%;gap:12px;margin:16px 0 34px}
+.banner{scroll-snap-align:start;cursor:pointer;min-width:0}
+.banner .k{font-size:12px;font-weight:700;color:var(--accent)}
+.banner .t{font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner .c{font-size:20px;color:var(--fg2);margin-bottom:8px}
+.art{height:200px;border-radius:18px;overflow:hidden;position:relative}
+.art .shade{background:linear-gradient(transparent 45%,rgba(0,0,0,.45))}
+.chips{position:absolute;bottom:14px;left:14px;display:flex;direction:ltr}
+.chips .logo{margin-right:-10px;box-shadow:0 0 0 2px #fff}
+.shelf-wrap{margin-bottom:34px}
+.shelf-h{display:flex;align-items:center;gap:4px;cursor:pointer;margin-bottom:6px;min-width:0}
+.shelf-h .h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shelf-h svg{width:20px;height:20px;color:var(--fg3);flex:none}
+.shelf{display:grid;grid-auto-flow:column;grid-template-rows:repeat(var(--r),auto);grid-auto-columns:86%;column-gap:16px}
+.shelf>.row{scroll-snap-align:start}
+
+/* nav bar for pushed pages */
+.nav{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;min-height:44px;padding-top:env(safe-area-inset-top,0px);padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));background:var(--bar);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);border-bottom:.5px solid var(--sep)}
+.back{display:flex;align-items:center;gap:2px;color:var(--accent);font-size:17px;padding:10px 4px}
+.back svg{width:22px;height:22px}
+.nt{flex:1;text-align:center;font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nr{min-width:70px;display:flex;justify-content:flex-end}
+.icon-btn{color:var(--accent);padding:10px}
+.icon-btn svg{width:24px;height:24px}
+
+/* channel page */
+.dhead{display:flex;gap:16px;align-items:stretch;margin:6px 0 20px}
+.dmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.dmeta .h2{font-size:22px;overflow-wrap:anywhere}
+.dact{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stats{display:flex;padding-block:12px}
+.stat{flex:none;width:104px;text-align:center;display:flex;flex-direction:column;gap:3px;position:relative}
+.stat+.stat::before{content:"";position:absolute;inset-inline-start:0;top:8px;bottom:8px;width:.5px;background:var(--sep)}
+.stat small{font-size:11px;font-weight:600;color:var(--fg2)}
+.stat b{font-size:20px;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+.stat span{font-size:12px;color:var(--fg2)}
+.sect{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.info{display:flex;flex-direction:column;gap:3px;padding-bottom:10px;border-bottom:.5px solid var(--sep);min-width:0}
+.info .l{font-size:14px;color:var(--fg2)}
+.info .v{font-size:15px;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px!important;direction:ltr;text-align:left}
+.tiles{display:flex;gap:14px;padding-bottom:4px}
+.tilec{width:100px;flex:none;cursor:pointer;scroll-snap-align:start}
+.tilec .name{font-size:13px;margin-top:6px}
+
+/* favorites grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:22px 16px;margin-top:20px}
+.gcell{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;text-align:center;min-width:0}
+.gcell .logo{box-shadow:0 4px 12px var(--shadow)}
+.gcell .name{font-size:13px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+/* search */
+.sbox{display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:10px;padding:8px 10px;margin:12px 0 8px}
+.sbox svg{width:18px;height:18px;color:var(--fg2);flex:none}
+.sbox input{border:0;background:none;flex:1;min-width:0;font-size:17px;outline:none}
+.disc{display:flex;flex-direction:column}
+.disc button{display:flex;align-items:center;gap:10px;color:var(--accent);font-size:19px;padding:11px 0;border-bottom:.5px solid var(--sep);text-align:start}
+.disc svg{width:18px;height:18px;color:var(--fg2);flex:none}
+.empty{text-align:center;padding:70px 20px;color:var(--fg2);display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty svg{width:56px;height:56px;color:var(--fg3)}
+.empty h3{color:var(--fg);font-size:22px;margin:6px 0 0}
+.empty p{margin:0;max-width:30ch}
+
+/* playlists */
+.ttl-row{display:flex;align-items:center;justify-content:space-between}
+.plus{width:34px;height:34px;color:var(--accent)}
+.plus svg{width:34px;height:34px}
+.pl{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:.5px solid var(--sep);cursor:pointer;min-width:0}
+.plic{width:54px;height:54px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none}
+.plic svg{width:26px;height:26px}
+.pl .meta{flex:1;min-width:0}
+.pl .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl small{display:block;font-size:12px;color:var(--fg3)}
+.pla{display:flex;gap:6px;flex:none}
+.mini{font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;background:var(--fill);color:var(--accent)}
+.mini.red{color:#ff3b30}
+.mini.redfill{background:#ff3b30;color:#fff}
+
+/* tab bar */
+#tabbar{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;justify-content:space-around;padding:6px max(8px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));background:var(--bar);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);border-top:.5px solid var(--sep)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:500;color:#8e8e93;min-width:56px;padding:2px 0}
+.tab svg{width:27px;height:27px}
+.tab.on{color:var(--accent)}
+
+/* player */
+.player{position:fixed;inset:0;z-index:50;background:#000;color:#fff;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);transform:translateY(102%);transition:transform .38s cubic-bezier(.2,.8,.2,1);visibility:hidden}
+.player.open{transform:none;visibility:visible}
+.phead{display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.circle{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.13);display:grid;place-items:center;flex:none;color:#fff}
+.circle svg{width:20px;height:20px}
+.circle.on{color:#ff375f}
+.ptitle{flex:1;min-width:0;text-align:center}
+.ptitle .name{color:#fff;font-weight:600}
+.ptitle .sub{color:rgba(255,255,255,.6);font-size:12px}
+.pv{position:relative;width:100%;max-width:100%;aspect-ratio:16/9;background:#000;max-height:60vh}
+.pv video{width:100%;height:100%;display:block;background:#000}
+.pv .spin{position:absolute;top:50%;left:50%;margin:-14px 0 0 -14px;pointer-events:none}
+.perr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;background:#000}
+.perr b{font-size:17px}
+.perr p{margin:0;font-size:13px;color:rgba(255,255,255,.62);max-width:36ch}
+.perr svg{width:40px;height:40px;color:#ffd60a}
+.pctl{display:flex;justify-content:center;align-items:center;gap:40px;padding:16px;direction:ltr}
+.pctl button{color:#fff}
+.pctl button:disabled{opacity:.3}
+.pctl svg{width:30px;height:30px}
+.live{display:flex;gap:6px;align-items:center;background:rgba(255,255,255,.13);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.live i{width:8px;height:8px;border-radius:50%;background:#ff3b30;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.qh{font-size:20px;font-weight:700;padding:4px max(16px,env(safe-area-inset-right,0px)) 8px}
+.queue{flex:1;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,0px);-webkit-overflow-scrolling:touch}
+.qrow{display:flex;align-items:center;gap:12px;padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));cursor:pointer;min-width:0}
+.qrow .name{flex:1;color:#fff;font-size:15px;font-weight:400}
+.qrow.on{background:rgba(255,255,255,.09)}
+.qrow.on .name{font-weight:700}
+.eq{display:flex;gap:2px;align-items:flex-end;height:16px}
+.eq i{width:3px;background:#0a84ff;border-radius:2px;animation:eq 1s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:-.4s}.eq i:nth-child(3){animation-delay:-.7s}
+@keyframes eq{0%,100%{height:4px}50%{height:16px}}
+
+/* sheet */
+.sheet-wrap{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.38);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-wrap.open{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:640px;max-height:92%;overflow-y:auto;background:var(--bg2);border-radius:14px 14px 0 0;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.sheet-wrap.open .sheet{transform:none}
+@media (prefers-color-scheme:dark){.sheet{background:#1c1c1e}.sheet .grp{background:#2c2c2e}}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px;position:sticky;top:0;background:inherit;z-index:1}
+.shead b{font-size:17px}
+.shead button{color:var(--accent);font-size:17px}
+.shead .ok{font-weight:700}
+.shead button:disabled{opacity:.35}
+.glabel{font-size:13px;color:var(--fg2);margin:18px 14px 6px}
+.gnote{font-size:13px;color:var(--fg2);margin:6px 14px 0}
+.grp{background:var(--card);border-radius:12px;overflow:hidden}
+.grp input,.grp textarea{width:100%;border:0;padding:12px 14px;font-size:16px;background:transparent;outline:none;display:block}
+.grp textarea{min-height:90px;resize:vertical;direction:ltr;text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.grp>*+*{border-top:.5px solid var(--sep)}
+.ltr{direction:ltr;text-align:left}
+.opt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;color:var(--accent);text-align:start}
+.opt svg{width:22px;height:22px;flex:none}
+.err{color:#ff3b30;font-size:14px;margin:12px 14px 0}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(40,40,42,.94);color:#fff;font-size:14px;padding:10px 16px;border-radius:14px;z-index:80;max-width:min(92vw,420px);text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="view"></main>
+
+<nav id="tabbar" aria-label="التبويبات"></nav>
+
+<section id="player" class="player" aria-label="المشغل">
+  <div class="phead">
+    <button class="circle" data-act="closePlayer" aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="ptitle"><div class="name" id="pName"></div><div class="sub" id="pGroup"></div></div>
+    <button class="circle" id="pFav" data-act="pfav" aria-label="المفضلة"></button>
+  </div>
+  <div class="pv">
+    <video id="vid" playsinline webkit-playsinline controls autoplay preload="auto"></video>
+    <div class="spin" id="pSpin"></div>
+    <div class="perr" id="pErr" hidden>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5 1.5 21h21L12 2.5Zm-1 6h2v6h-2v-6Zm0 8h2v2h-2v-2Z"/></svg>
+      <b>تعذّر تشغيل القناة</b>
+      <p id="pErrMsg"></p>
+    </div>
+  </div>
+  <div class="pctl">
+    <button data-act="prev" id="pPrev" aria-label="السابقة"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+    <div class="live"><i></i>مباشر</div>
+    <button data-act="next" id="pNext" aria-label="التالية"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+  </div>
+  <div class="qh">قائمة التشغيل</div>
+  <div class="queue" id="queue"></div>
+</section>
+
+<div class="sheet-wrap" id="sheetWrap" data-act="closeSheetBg">
+  <div class="sheet" id="sheet" role="dialog" aria-label="إضافة قائمة"></div>
+</div>
+
+<div id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js" defer></script>
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const PALETTES = [["#5c45f2","#c74aed"],["#007aff","#33ccf2"],["#ff7333","#ff387a"],["#0da68c","#73d959"],["#eb3340","#ff9e33"],["#1a2966","#3373f2"],["#8c33d9","#ff66b3"],["#1f1f29","#61667a"]];
+function hash(s){ let h = 5381; for (const ch of String(s)) h = (h * 33 + ch.codePointAt(0)) >>> 0; return h; }
+function grad(k){ const p = PALETTES[hash(k) % PALETTES.length]; return `linear-gradient(135deg,${p[0]},${p[1]})`; }
+function initials(n){
+  const w = String(n).split(/[\s\-_|]+/).filter(Boolean);
+  if (!w.length) return "TV";
+  if (/[\u0600-\u06FF]/.test(w[0])){ const a = w[0].replace(/^ال(?=..)/, ""); return [...a].slice(0, 2).join(""); }
+  return w.slice(0, 2).map((x) => [...x][0]).join("").toUpperCase();
+}
+const fmtN = (n) => n.toLocaleString("ar");
+
+const ICON = {
+  today:'<svg viewBox="0 0 28 28" fill="currentColor"><rect x="4" y="3" width="20" height="22" rx="4" opacity=".25"/><rect x="4" y="3" width="20" height="13" rx="4"/><rect x="7" y="19" width="10" height="2" rx="1"/></svg>',
+  browse:'<svg viewBox="0 0 28 28" fill="currentColor"><path d="M14 3 3 8.5 14 14l11-5.5L14 3Z"/><path d="m5.3 12.6-2.3 1.2L14 19.3l11-5.5-2.3-1.2L14 16.9l-8.7-4.3Z" opacity=".7"/><path d="m5.3 17.3-2.3 1.2L14 24l11-5.5-2.3-1.2L14 21.6l-8.7-4.3Z" opacity=".45"/></svg>',
+  fav:'<svg viewBox="0 0 28 28" fill="currentColor"><path d="M14 24s-9.5-5.6-9.5-12.2A5.3 5.3 0 0 1 14 8.6a5.3 5.3 0 0 1 9.5 3.2C23.5 18.4 14 24 14 24Z"/></svg>',
+  lists:'<svg viewBox="0 0 28 28" fill="currentColor"><rect x="5" y="3" width="18" height="22" rx="4" opacity=".25"/><rect x="9" y="8" width="10" height="2.4" rx="1.2"/><rect x="9" y="13" width="10" height="2.4" rx="1.2"/><rect x="9" y="18" width="6" height="2.4" rx="1.2"/></svg>',
+  search:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12.5" cy="12.5" r="7.5"/><path d="m18.5 18.5 5.5 5.5"/></svg>',
+  person:'<svg viewBox="0 0 38 38"><circle cx="19" cy="19" r="19" fill="currentColor" opacity=".18"/><circle cx="19" cy="15" r="6" fill="currentColor"/><path d="M8 31c2.5-5 6.5-7 11-7s8.5 2 11 7" fill="currentColor"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20.5S3.5 15.6 3.5 9.8A4.6 4.6 0 0 1 12 7.2a4.6 4.6 0 0 1 8.5 2.6c0 5.8-8.5 10.7-8.5 10.7Z"/></svg>',
+  heartF:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5S3.5 15.6 3.5 9.8A4.6 4.6 0 0 1 12 7.2a4.6 4.6 0 0 1 8.5 2.6c0 5.8-8.5 10.7-8.5 10.7Z"/></svg>',
+  plus:'<svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="currentColor"/><path d="M17 10v14M10 17h14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.5V9h5.5L13 3.5Z"/></svg>',
+  antenna:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M8 8a5.6 5.6 0 0 0 0 8M16 8a5.6 5.6 0 0 1 0 8M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/></svg>',
+  globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>',
+  tv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="6" width="19" height="13" rx="3"/><path d="m8.5 2.5 3.5 3.5 3.5-3.5"/></svg>',
+};
+
+/* ---------- category names ---------- */
+const AR_GROUPS = { news:"أخبار", sports:"رياضة", entertainment:"ترفيه", general:"عامة", religious:"دينية", kids:"أطفال", movies:"أفلام", music:"موسيقى", documentary:"وثائقية", culture:"ثقافة", series:"مسلسلات", business:"اقتصاد", education:"تعليم", lifestyle:"أسلوب حياة", undefined:"متنوعة", cooking:"طبخ", comedy:"كوميديا", family:"عائلة", science:"علوم", travel:"سفر", weather:"طقس", shop:"تسوق", outdoor:"طبيعة", classic:"كلاسيكية", auto:"سيارات", animation:"رسوم متحركة", legislative:"برلمانية", relax:"استرخاء", public:"حكومية", quran:"قرآن" };
+function groupName(raw){
+  const first = String(raw || "").split(";")[0].trim();
+  if (!first) return "عامة";
+  return AR_GROUPS[first.toLowerCase()] || first;
+}
+
+/* ---------- M3U parser ---------- */
+function parseInfo(line){
+  const attrs = {};
+  for (const m of line.matchAll(/([A-Za-z0-9_-]+)\s*=\s*"([^"]*)"/g)) attrs[m[1].toLowerCase()] = m[2].trim();
+  let q = false, idx = -1;
+  for (let i = 0; i < line.length; i++){ const c = line[i]; if (c === '"') q = !q; else if (c === "," && !q){ idx = i; break; } }
+  return { name: idx >= 0 ? line.slice(idx + 1).trim() : "", attrs };
+}
+function parseM3U(text){
+  const out = []; let info = null, grp = null;
+  for (let line of String(text).replace(/\r\n?/g, "\n").split("\n")){
+    line = line.replace(/^﻿/, "").trim();
+    if (!line) continue;
+    const up = line.toUpperCase();
+    if (up.startsWith("#EXTINF")){ info = parseInfo(line); grp = null; }
+    else if (up.startsWith("#EXTGRP:")){ grp = line.slice(8).trim(); }
+    else if (line.startsWith("#")) continue;
+    else if (/^[a-z][a-z0-9+.-]*:\/\//i.test(line)){
+      const a = info ? info.attrs : {};
+      let name = (info && info.name) || a["tvg-name"] || "";
+      if (!name){ try { name = decodeURIComponent(line.split("?")[0].split("/").pop()); } catch { name = "قناة"; } }
+      out.push({ id: uid(), name, url: line, logo: a["tvg-logo"] || "", group: groupName(a["group-title"] || grp), tvgId: a["tvg-id"] || "", country: a["tvg-country"] || "", language: a["tvg-language"] || "" });
+      info = null; grp = null;
+    }
+  }
+  return out;
+}
+
+/* ---------- state ---------- */
+const KEY = "bath.v1";
+const SAMPLE = "https://iptv-org.github.io/iptv/languages/ara.m3u";
+const SAMPLES = [
+  { t: "قنوات عربية", u: SAMPLE },
+  { t: "قنوات إخبارية", u: "https://iptv-org.github.io/iptv/categories/news.m3u" },
+  { t: "قنوات رياضية", u: "https://iptv-org.github.io/iptv/categories/sports.m3u" },
+];
+let S = { playlists: [], favorites: [], recents: [] };
+let hadSaved = false, booting = false;
+let groups = [], byId = new Map(), lastSearch = [];
+function load(){
+  try { const raw = localStorage.getItem(KEY); if (raw){ const d = JSON.parse(raw); S = { playlists: d.playlists || [], favorites: d.favorites || [], recents: d.recents || [] }; hadSaved = true; } } catch {}
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch { toast("مساحة التخزين ممتلئة. احذف قائمة كبيرة ثم حاول مجددًا."); }
+}
+function rebuild(){
+  byId = new Map();
+  const m = new Map();
+  for (const p of S.playlists) for (const c of p.channels){
+    byId.set(c.id, c);
+    if (!m.has(c.group)) m.set(c.group, []);
+    m.get(c.group).push(c);
+  }
+  for (const c of S.favorites) if (!byId.has(c.id)) byId.set(c.id, c);
+  for (const c of S.recents) if (!byId.has(c.id)) byId.set(c.id, c);
+  groups = [...m].map(([name, channels]) => ({ name, channels }));
+}
+const isFav = (c) => S.favorites.some((x) => x.url === c.url);
+function toggleFav(c){
+  if (isFav(c)){ S.favorites = S.favorites.filter((x) => x.url !== c.url); toast("أُزيلت من المفضلة"); }
+  else { S.favorites.unshift(c); toast("أُضيفت إلى المفضلة"); }
+  save(); rebuild();
+}
+function markPlayed(c){ S.recents = [c, ...S.recents.filter((x) => x.url !== c.url)].slice(0, 20); save(); rebuild(); }
+const groupOf = (name) => groups.find((g) => g.name === name);
+function playlistOf(c){ return S.playlists.find((p) => p.channels.some((x) => x.id === c.id)); }
+
+async function fetchList(url){
+  let res;
+  try { res = await fetch(url, { cache: "no-store" }); }
+  catch { throw new Error("تعذّر الوصول إلى الرابط. قد يمنع المزوّد قراءة القائمة من المتصفح؛ احفظ الملف واستورده، أو الصق محتواه."); }
+  if (!res.ok) throw new Error(`الخادم رد بالخطأ ${res.status}. تأكد من صحة الرابط.`);
+  const list = parseM3U(await res.text());
+  if (!list.length) throw new Error("لم يتم العثور على قنوات في هذه القائمة.");
+  return list;
+}
+async function addFromUrl(name, url){
+  url = url.trim();
+  if (!/^https?:\/\//i.test(url)) throw new Error("الرابط يجب أن يبدأ بـ http أو https.");
+  const channels = await fetchList(url);
+  let host = ""; try { host = new URL(url).hostname; } catch {}
+  S.playlists.push({ id: uid(), name: name.trim() || host || "قائمة جديدة", source: url, channels, updatedAt: Date.now() });
+  save(); rebuild();
+  return channels.length;
+}
+function addFromText(name, text){
+  const channels = parseM3U(text);
+  if (!channels.length) throw new Error("لم يتم العثور على قنوات. تأكد أن النص يبدأ بـ ‎#EXTM3U.");
+  S.playlists.push({ id: uid(), name: name.trim() || "قائمة مستوردة", source: "", channels, updatedAt: Date.now() });
+  save(); rebuild();
+  return channels.length;
+}
+async function refreshPl(id){
+  const p = S.playlists.find((x) => x.id === id); if (!p || !p.source) return;
+  toast("جارٍ التحديث…");
+  try { p.channels = await fetchList(p.source); p.updatedAt = Date.now(); save(); rebuild(); render(); toast(`تم التحديث: ${fmtN(p.channels.length)} قناة`); }
+  catch (e){ toast(e.message); }
+}
+
+/* ---------- UI pieces ---------- */
+function logo(c, s){
+  const img = c.logo ? `<img src="${esc(c.logo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="this.parentNode.classList.add('ok')" onerror="this.remove()">` : "";
+  return `<div class="logo" style="--s:${s}px;background:${grad(c.name)}"><span>${esc(initials(c.name))}</span>${img}</div>`;
+}
+const subOf = (c) => c.country ? `${c.group} · ${c.country}` : c.group;
+function row(c, q, div){
+  return `<div class="row${div ? " div" : ""}" data-ch="${c.id}">${logo(c, 60)}<div class="meta"><div class="name">${esc(c.name)}</div><div class="sub">${esc(subOf(c))}</div></div><button class="get" data-play="${c.id}" data-q="${esc(q)}">تشغيل</button></div>`;
+}
+function navbar(title, right){
+  return `<div class="nav"><button class="back" data-back>${ICON.back}رجوع</button><div class="nt">${esc(title)}</div><div class="nr">${right || ""}</div></div>`;
+}
+function empty(icon, title, text, extra){
+  return `<div class="empty">${icon}<h3>${title}</h3><p>${text}</p>${extra || ""}</div>`;
+}
+function feature(g, eyebrow){
+  const c0 = g.channels[0], n = g.channels.length;
+  return `<div class="feature" role="button" tabindex="0" data-grp="${esc(g.name)}" style="background:${grad(g.name)}">
+    <div class="mosaic">${g.channels.slice(0, 16).map((c) => logo(c, 72)).join("")}</div>
+    <div class="shade"></div>
+    <div class="ftxt"><div class="eyebrow">${eyebrow}</div><h3>${esc(g.name)}</h3><div class="eyebrow">${fmtN(n)} قناة</div></div>
+    <div class="foot">${logo(c0, 44)}<div class="meta"><div class="name">${esc(c0.name)}</div><div class="sub">${n > 1 ? `وأكثر من ${fmtN(n - 1)} قناة أخرى` : "قناة واحدة"}</div></div><span class="ghost">عرض</span></div>
+  </div>`;
+}
+function listCard(eyebrow, title, list, q){
+  return `<div class="lcard"><div class="eyebrow">${eyebrow}</div><h2 class="h2">${title}</h2>${list.map((c, i) => row(c, q, i < list.length - 1)).join("")}</div>`;
+}
+const sortedGroups = () => [...groups].sort((a, b) => b.channels.length - a.channels.length);
+
+/* ---------- views ---------- */
+function vToday(){
+  const d = new Date().toLocaleDateString("ar", { weekday: "long", day: "numeric", month: "long" });
+  let h = `<div class="page"><header class="th"><div><div class="date">${d}</div><h1 class="h1">اليوم</h1></div><button class="avatar" data-tab="lists" aria-label="القوائم">${ICON.person}</button></header><div class="stack">`;
+  if (booting && !S.playlists.length){
+    h += `<div class="welcome"><div class="spin"></div><div class="eyebrow">لحظات</div><h3>نجهّز قنواتك</h3><p>نحمّل قائمة قنوات عربية مجانية للتجربة. تقدر تضيف قائمتك الخاصة من تبويب «القوائم».</p></div>`;
+  } else if (!S.playlists.length){
+    h += `<div class="welcome">${ICON.tv.replace("<svg", '<svg style="width:46px;height:46px"')}<div class="eyebrow">ابدأ المشاهدة</div><h3>أضف أول قائمة M3U</h3><p>الصق رابط القائمة أو استورد ملفًا، ونرتّب القنوات في مجموعات بعرض احترافي.</p><button class="cta press" data-act="add">إضافة قائمة</button></div>`;
+  } else {
+    const f = sortedGroups();
+    if (f[0]) h += feature(f[0], "الأكثر قنوات");
+    if (S.recents.length) h += listCard("تابع المشاهدة", "شاهدتها مؤخرًا", S.recents.slice(0, 4), "rec");
+    f.slice(1, 7).forEach((g) => (h += feature(g, "مجموعة مميزة")));
+    if (S.favorites.length) h += listCard("مكتبتك", "قنواتك المفضلة", S.favorites.slice(0, 4), "fav");
+  }
+  return h + "</div></div>";
+}
+function banner(g){
+  return `<div class="banner" data-grp="${esc(g.name)}"><div class="k">مجموعة</div><div class="t">${esc(g.name)}</div><div class="c">${fmtN(g.channels.length)} قناة</div>
+    <div class="art" style="background:${grad(g.name)}"><div class="mosaic sm">${g.channels.slice(0, 12).map((c) => logo(c, 58)).join("")}</div><div class="shade"></div><div class="chips">${g.channels.slice(0, 4).map((c) => logo(c, 40)).join("")}</div></div></div>`;
+}
+function shelf(g){
+  const items = g.channels.slice(0, 24), r = Math.min(3, items.length);
+  return `<section class="shelf-wrap"><div class="shelf-h" data-grp="${esc(g.name)}"><h2 class="h2">${esc(g.name)}</h2>${ICON.chev}</div>
+    <div class="shelf hscroll bleed" style="--r:${r}">${items.map((c, i) => row(c, "g:" + g.name, i % r !== r - 1 && i !== items.length - 1)).join("")}</div></section>`;
+}
+function vBrowse(){
+  if (!groups.length) return `<div class="page"><h1 class="h1">القنوات</h1>${empty(ICON.tv, "لا توجد قنوات بعد", "أضف قائمة M3U من تبويب «القوائم».")}</div>`;
+  return `<div class="page"><h1 class="h1">القنوات</h1><div class="banners hscroll bleed">${sortedGroups().slice(0, 8).map(banner).join("")}</div>${groups.map(shelf).join("")}</div>`;
+}
+function vGroup(e){
+  const g = groupOf(e.name);
+  if (!g) return navbar("") + `<div class="page sub">${empty(ICON.tv, "المجموعة غير موجودة", "ربما حُذفت القائمة.")}</div>`;
+  return navbar(g.name) + `<div class="page sub"><h1 class="h1">${esc(g.name)}</h1><div class="muted">${fmtN(g.channels.length)} قناة</div>
+    <label class="sbox">${ICON.search}<input id="gq" type="search" placeholder="ابحث في هذه المجموعة" value="${esc(e.q || "")}" autocomplete="off"></label>
+    <div id="glist">${groupRows(g, e.q)}</div></div>`;
+}
+function groupRows(g, q){
+  const list = q ? g.channels.filter((c) => c.name.toLowerCase().includes(q.toLowerCase())) : g.channels;
+  return list.map((c, i) => row(c, "g:" + g.name, i < list.length - 1)).join("") || `<p class="muted">لا توجد نتائج.</p>`;
+}
+function vChannel(e){
+  const c = byId.get(e.id);
+  if (!c) return navbar("") + `<div class="page sub">${empty(ICON.tv, "القناة غير موجودة", "ربما تم تحديث القائمة.")}</div>`;
+  const g = groupOf(c.group), sib = g ? g.channels : [c], fav = isFav(c), pl = playlistOf(c);
+  const ext = (c.url.split("?")[0].split(".").pop() || "").toLowerCase();
+  const kind = { m3u8: "HLS", mp4: "MP4", ts: "TS", mp3: "صوت", aac: "صوت" }[ext] || "STREAM";
+  const others = sib.filter((x) => x.id !== c.id).slice(0, 20);
+  return navbar("", `<button class="icon-btn" data-fav="${c.id}" aria-label="المفضلة" style="color:${fav ? "#ff375f" : "var(--accent)"}">${fav ? ICON.heartF : ICON.heart}</button>`) +
+  `<div class="page sub">
+    <div class="dhead">${logo(c, 118)}<div class="dmeta"><h1 class="h2">${esc(c.name)}</h1><div class="sub">${esc(c.group)}</div>
+      <div class="dact"><button class="get big" data-play="${c.id}" data-q="g:${esc(c.group)}">تشغيل</button><button class="mini" data-copy="${esc(c.url)}">نسخ الرابط</button></div></div></div>
+    <hr><div class="stats hscroll">
+      <div class="stat"><small>المجموعة</small><b>${fmtN(sib.length)}</b><span>قناة</span></div>
+      <div class="stat"><small>النوع</small><b>${kind}</b><span>بث مباشر</span></div>
+      <div class="stat"><small>الدولة</small><b>${esc(c.country || "—")}</b><span>البلد</span></div>
+      <div class="stat"><small>اللغة</small><b>${esc((c.language || "—").split(";")[0])}</b><span>الصوت</span></div>
+    </div><hr>
+    <div class="sect"><h2 class="h2">معلومات</h2>
+      <div class="info"><span class="l">القائمة</span><span class="v">${esc(pl ? pl.name : "—")}</span></div>
+      <div class="info"><span class="l">المجموعة</span><span class="v">${esc(c.group)}</span></div>
+      ${c.tvgId ? `<div class="info"><span class="l">المعرّف tvg-id</span><span class="v mono">${esc(c.tvgId)}</span></div>` : ""}
+      <div class="info"><span class="l">رابط البث</span><span class="v mono">${esc(c.url)}</span></div>
+    </div>
+    ${others.length ? `<div class="sect"><h2 class="h2">من نفس المجموعة</h2><div class="tiles hscroll bleed">${others.map((o) => `<div class="tilec" data-ch="${o.id}">${logo(o, 100)}<div class="name">${esc(o.name)}</div></div>`).join("")}</div></div>` : ""}
+  </div>`;
+}
+function vFav(){
+  if (!S.favorites.length) return `<div class="page"><h1 class="h1">المفضلة</h1>${empty(ICON.heart, "لا توجد قنوات مفضلة", "اضغط على القلب في صفحة أي قناة لإضافتها هنا.")}</div>`;
+  return `<div class="page"><h1 class="h1">المفضلة</h1><div class="grid">${S.favorites.map((c) => `<div class="gcell press" data-play="${c.id}" data-q="fav">${logo(c, 92)}<div class="name">${esc(c.name)}</div></div>`).join("")}</div></div>`;
+}
+let pendingDel = null;
+function relTime(t){
+  const s = Math.round((t - Date.now()) / 1000), rtf = new Intl.RelativeTimeFormat("ar", { numeric: "auto" });
+  const a = Math.abs(s);
+  if (a < 60) return rtf.format(s, "second");
+  if (a < 3600) return rtf.format(Math.round(s / 60), "minute");
+  if (a < 86400) return rtf.format(Math.round(s / 3600), "hour");
+  return rtf.format(Math.round(s / 86400), "day");
+}
+function vLists(){
+  let h = `<div class="page"><div class="ttl-row"><h1 class="h1">القوائم</h1><button class="plus" data-act="add" aria-label="إضافة قائمة">${ICON.plus}</button></div>`;
+  if (!S.playlists.length) return h + empty(ICON.lists.replace("<svg", '<svg style="width:56px;height:56px"'), "لا توجد قوائم", "أضف رابط M3U أو استورد ملفًا من جهازك.", `<button class="get big" data-act="add" style="margin-top:12px">إضافة قائمة</button>`) + "</div>";
+  h += S.playlists.map((p) => {
+    const gc = new Set(p.channels.map((c) => c.group)).size;
+    const actions = pendingDel === p.id
+      ? `<button class="mini" data-act="cancelDel">إلغاء</button><button class="mini redfill" data-act="delok" data-id="${p.id}">حذف</button>`
+      : `${p.source ? `<button class="mini" data-act="refresh" data-id="${p.id}">تحديث</button>` : ""}<button class="mini red" data-act="del" data-id="${p.id}">حذف</button>`;
+    return `<div class="pl" data-pl="${p.id}"><div class="plic" style="background:${grad(p.name)}">${p.source ? ICON.antenna : ICON.file}</div>
+      <div class="meta"><div class="t">${esc(p.name)}</div><div class="sub">${fmtN(p.channels.length)} قناة · ${fmtN(gc)} مجموعة</div><small>آخر تحديث ${relTime(p.updatedAt)}</small></div>
+      <div class="pla">${actions}</div></div>`;
+  }).join("");
+  return h + `<p class="muted" style="font-size:13px;margin-top:16px">تُحفظ القوائم على هذا الجهاز فقط.</p></div>`;
+}
+function vPlaylist(e){
+  const p = S.playlists.find((x) => x.id === e.id);
+  if (!p) return navbar("") + `<div class="page sub">${empty(ICON.tv, "القائمة غير موجودة", "")}</div>`;
+  const m = new Map(); for (const c of p.channels){ if (!m.has(c.group)) m.set(c.group, []); m.get(c.group).push(c); }
+  return navbar(p.name) + `<div class="page sub"><h1 class="h1">${esc(p.name)}</h1><div class="muted" style="margin-bottom:8px">${fmtN(p.channels.length)} قناة</div>
+    ${[...m].map(([name, list], i, arr) => `<div class="row${i < arr.length - 1 ? " div" : ""}" data-grp="${esc(name)}" style="--x:0">${logo(list[0], 44)}<div class="meta"><div class="name">${esc(name)}</div><div class="sub">${fmtN(list.length)} قناة</div></div><span style="color:var(--fg3);width:18px;height:18px;display:block">${ICON.chev}</span></div>`).join("")}</div>`;
+}
+function vSearch(e){
+  const disc = sortedGroups().slice(0, 12);
+  return `<div class="page"><h1 class="h1">بحث</h1>
+    <label class="sbox">${ICON.search}<input id="sq" type="search" placeholder="قنوات، مجموعات، والمزيد" value="${esc(e.q || "")}" autocomplete="off" enterkeyhint="search"></label>
+    <div id="sres">${searchBody(e.q || "", disc)}</div></div>`;
+}
+function searchBody(q, disc){
+  q = q.trim();
+  if (!q){
+    if (!disc.length) return empty(ICON.search, "لا يوجد ما نبحث فيه", "أضف قائمة أولًا من تبويب «القوائم».");
+    return `<h2 class="h2" style="margin-top:12px">اكتشف</h2><div class="disc">${disc.map((g) => `<button data-sq="${esc(g.name)}">${ICON.search}${esc(g.name)}</button>`).join("")}</div>`;
+  }
+  const ql = q.toLowerCase(), res = [];
+  for (const g of groups) for (const c of g.channels){
+    if (c.name.toLowerCase().includes(ql) || c.group.toLowerCase().includes(ql)){ res.push(c); if (res.length >= 200) break; }
+  }
+  lastSearch = res;
+  if (!res.length) return empty(ICON.search, `لا نتائج لـ «${esc(q)}»`, "تحقق من الإملاء أو جرّب كلمة أخرى.");
+  return res.map((c, i) => row(c, "srch", i < res.length - 1)).join("");
+}
+
+/* ---------- navigation ---------- */
+const VIEWS = { today: vToday, browse: vBrowse, fav: vFav, lists: vLists, search: vSearch, grp: vGroup, ch: vChannel, pl: vPlaylist };
+const TABS = [["today", "اليوم"], ["browse", "القنوات"], ["fav", "المفضلة"], ["lists", "القوائم"], ["search", "بحث"]];
+let tab = "today";
+const stacks = Object.fromEntries(TABS.map(([k]) => [k, [{ v: k }]]));
+const cur = () => stacks[tab][stacks[tab].length - 1];
+function render(){
+  const e = cur();
+  $("#view").innerHTML = VIEWS[e.v](e);
+  $("#tabbar").innerHTML = TABS.map(([k, t]) => `<button class="tab${k === tab ? " on" : ""}" data-tab="${k}">${ICON[k]}<span>${t}</span></button>`).join("");
+  const sq = $("#sq");
+  if (sq) sq.addEventListener("input", () => { e.q = sq.value; $("#sres").innerHTML = searchBody(sq.value, sortedGroups().slice(0, 12)); });
+  const gq = $("#gq");
+  if (gq) gq.addEventListener("input", () => { e.q = gq.value; const g = groupOf(e.name); if (g) $("#glist").innerHTML = groupRows(g, gq.value); });
+}
+function push(e){ cur().y = scrollY; stacks[tab].push(e); render(); scrollTo(0, 0); }
+function pop(){ const s = stacks[tab]; if (s.length > 1){ s.pop(); render(); scrollTo(0, cur().y || 0); } }
+function switchTab(t){
+  if (t === tab){ stacks[t].length = 1; render(); scrollTo({ top: 0, behavior: "smooth" }); return; }
+  cur().y = scrollY; tab = t; render(); scrollTo(0, cur().y || 0);
+}
+
+/* ---------- player ---------- */
+const vid = $("#vid");
+let Q = [], now = null, hls = null;
+function resolveQueue(k){
+  if (!k) return null;
+  if (k.startsWith("g:")){ const g = groupOf(k.slice(2)); return g ? g.channels : null; }
+  return { rec: S.recents, fav: S.favorites, srch: lastSearch }[k] || null;
+}
+function play(id, qk){
+  const c = byId.get(id); if (!c) return;
+  Q = (resolveQueue(qk) || [c]).slice();
+  if (!Q.some((x) => x.id === c.id)) Q.unshift(c);
+  $("#player").classList.add("open");
+  document.body.style.overflow = "hidden";
+  loadChannel(c);
+}
+function loadChannel(c){
+  now = c;
+  markPlayed(c);
+  $("#pErr").hidden = true; $("#pSpin").hidden = false;
+  if (hls){ hls.destroy(); hls = null; }
+  const isHls = /\.m3u8($|\?)/i.test(c.url);
+  if (isHls && !vid.canPlayType("application/vnd.apple.mpegurl") && window.Hls && window.Hls.isSupported()){
+    hls = new window.Hls();
+    hls.on(window.Hls.Events.ERROR, (_, d) => { if (d.fatal) showErr(); });
+    hls.loadSource(c.url); hls.attachMedia(vid);
+  } else {
+    vid.src = c.url;
+  }
+  const p = vid.play(); if (p && p.catch) p.catch(() => {});
+  playerUI();
+}
+function showErr(){
+  if (!now) return;
+  $("#pSpin").hidden = true; $("#pErr").hidden = false;
+  $("#pErrMsg").textContent = (location.protocol === "https:" && /^http:/i.test(now.url))
+    ? "هذا الرابط غير مشفّر (http) ولا يسمح Safari بتشغيله داخل صفحة آمنة. اطلب من المزوّد رابط https."
+    : "قد يكون البث متوقفًا حاليًا أو بصيغة لا يدعمها Safari. جرّب قناة أخرى.";
+}
+vid.addEventListener("playing", () => { $("#pSpin").hidden = true; $("#pErr").hidden = true; });
+vid.addEventListener("waiting", () => { $("#pSpin").hidden = false; });
+vid.addEventListener("error", () => { if (vid.getAttribute("src")) showErr(); });
+function playerUI(){
+  const c = now; if (!c) return;
+  $("#pName").textContent = c.name; $("#pGroup").textContent = c.group;
+  const fav = isFav(c), fb = $("#pFav");
+  fb.innerHTML = fav ? ICON.heartF : ICON.heart; fb.classList.toggle("on", fav);
+  $("#pPrev").disabled = $("#pNext").disabled = Q.length < 2;
+  $("#queue").innerHTML = Q.map((x) => `<div class="qrow${x.id === c.id ? " on" : ""}" data-qp="${x.id}">${logo(x, 44)}<div class="name">${esc(x.name)}</div>${x.id === c.id ? '<div class="eq"><i></i><i></i><i></i></div>' : ""}</div>`).join("");
+  const on = $("#queue .qrow.on"); if (on) on.scrollIntoView({ block: "center" });
+}
+function step(d){
+  if (!now || Q.length < 2) return;
+  const i = Q.findIndex((x) => x.id === now.id);
+  loadChannel(Q[(i + d + Q.length) % Q.length]);
+}
+function closePlayer(){
+  $("#player").classList.remove("open");
+  document.body.style.overflow = "";
+  vid.pause();
+  if (hls){ hls.destroy(); hls = null; }
+  vid.removeAttribute("src"); vid.load();
+  now = null;
+  render();
+}
+
+/* ---------- add sheet ---------- */
+function openSheet(){
+  $("#sheet").innerHTML = `
+    <div class="shead"><button data-act="closeSheet">إلغاء</button><b>إضافة قائمة</b><button class="ok" id="addBtn" data-act="submit">إضافة</button></div>
+    <div class="glabel">رابط M3U</div>
+    <div class="grp"><input id="fName" placeholder="اسم القائمة (اختياري)" autocomplete="off"><input id="fUrl" class="ltr" type="url" inputmode="url" placeholder="https://example.com/playlist.m3u" autocapitalize="off" autocomplete="off" spellcheck="false"></div>
+    <div class="gnote">يدعم روابط m3u و m3u8 مع الشعارات والمجموعات.</div>
+    <div class="glabel">قوائم مجانية للتجربة</div>
+    <div class="grp">${SAMPLES.map((s) => `<button class="opt" data-sample="${esc(s.u)}" data-t="${esc(s.t)}">${ICON.globe}${s.t}</button>`).join("")}</div>
+    <div class="glabel">أو من جهازك</div>
+    <div class="grp"><label class="opt" for="fFile">${ICON.file}استيراد ملف ‎.m3u</label><input id="fFile" type="file" accept=".m3u,.m3u8,audio/x-mpegurl,application/vnd.apple.mpegurl,text/plain" hidden></div>
+    <div class="glabel">أو الصق محتوى القائمة</div>
+    <div class="grp"><textarea id="fText" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-logo=&quot;…&quot; group-title=&quot;…&quot;,اسم القناة&#10;https://…/stream.m3u8"></textarea></div>
+    <div class="err" id="fErr" hidden></div>`;
+  $("#sheetWrap").classList.add("open");
+  $("#fFile").addEventListener("change", (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { try { const n = addFromText($("#fName").value || f.name.replace(/\.[^.]+$/, ""), r.result); closeSheet(); toast(`أُضيفت ${fmtN(n)} قناة`); render(); } catch (e){ sheetErr(e.message); } };
+    r.readAsText(f);
+  });
+}
+function closeSheet(){ $("#sheetWrap").classList.remove("open"); }
+function sheetErr(m){ const e = $("#fErr"); e.textContent = m; e.hidden = !m; }
+async function submitSheet(){
+  const name = $("#fName").value, url = $("#fUrl").value, text = $("#fText").value;
+  sheetErr("");
+  const btn = $("#addBtn"); btn.disabled = true; btn.textContent = "جارٍ…";
+  try {
+    let n;
+    if (url.trim()) n = await addFromUrl(name, url);
+    else if (text.trim()) n = addFromText(name, text);
+    else throw new Error("أدخل رابط القائمة أو الصق محتواها.");
+    closeSheet(); toast(`أُضيفت ${fmtN(n)} قناة`); render();
+  } catch (e){ sheetErr(e.message); }
+  finally { btn.disabled = false; btn.textContent = "إضافة"; }
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(m){ const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600); }
+
+/* ---------- events ---------- */
+document.addEventListener("click", (ev) => {
+  const t = ev.target.closest("[data-play],[data-qp],[data-ch],[data-grp],[data-tab],[data-back],[data-fav],[data-act],[data-copy],[data-pl],[data-sq],[data-sample]");
+  if (!t) return;
+  const d = t.dataset;
+  if (d.play) play(d.play, d.q);
+  else if (d.qp){ const c = byId.get(d.qp) || Q.find((x) => x.id === d.qp); if (c) loadChannel(c); }
+  else if (d.ch) push({ v: "ch", id: d.ch });
+  else if (d.grp !== undefined) push({ v: "grp", name: d.grp });
+  else if (d.tab) switchTab(d.tab);
+  else if (d.back !== undefined) pop();
+  else if (d.pl) push({ v: "pl", id: d.pl });
+  else if (d.fav){ const c = byId.get(d.fav); if (c){ toggleFav(c); render(); } }
+  else if (d.sq !== undefined){ const i = $("#sq"); i.value = d.sq; i.dispatchEvent(new Event("input")); }
+  else if (d.sample){ $("#fName").value = d.t; $("#fUrl").value = d.sample; $("#fText").value = ""; }
+  else if (d.copy){
+    const done = () => toast("تم نسخ الرابط");
+    if (navigator.clipboard) navigator.clipboard.writeText(d.copy).then(done, () => toast(d.copy)); else toast(d.copy);
+  }
+  else if (d.act){
+    ev.stopPropagation();
+    switch (d.act){
+      case "add": openSheet(); break;
+      case "closeSheet": closeSheet(); break;
+      case "closeSheetBg": if (ev.target === t) closeSheet(); break;
+      case "submit": submitSheet(); break;
+      case "closePlayer": closePlayer(); break;
+      case "prev": step(-1); break;
+      case "next": step(1); break;
+      case "pfav": if (now){ toggleFav(now); playerUI(); } break;
+      case "refresh": refreshPl(d.id); break;
+      case "del": pendingDel = d.id; render(); break;
+      case "cancelDel": pendingDel = null; render(); break;
+      case "delok": S.playlists = S.playlists.filter((p) => p.id !== d.id); pendingDel = null; save(); rebuild(); render(); toast("حُذفت القائمة"); break;
+    }
+  }
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter" && ev.target.matches('[role="button"]')) ev.target.click();
+  if (ev.key === "Escape"){ if ($("#sheetWrap").classList.contains("open")) closeSheet(); else if (now) closePlayer(); }
+});
+
+/* ---------- boot ---------- */
+load(); rebuild(); render();
+if (!hadSaved){
+  booting = true; render();
+  addFromUrl("قنوات عربية (تجريبية)", SAMPLE)
+    .catch(() => { save(); })
+    .finally(() => { booting = false; render(); });
+}
+</script>
+</body>
+</html>
