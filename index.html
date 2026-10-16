@@ -236,10 +236,32 @@ hr{border:0;height:.5px;background:var(--sep);margin:0}
 .opt svg{width:22px;height:22px;flex:none}
 .err{color:#ff3b30;font-size:14px;margin:12px 14px 0}
 #toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(40,40,42,.94);color:#fff;font-size:14px;padding:10px 16px;border-radius:14px;z-index:80;max-width:min(92vw,420px);text-align:center}
+/* lock screen */
+.lock{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px max(24px,env(safe-area-inset-right,0px)) 24px max(24px,env(safe-area-inset-left,0px));background:var(--bg);text-align:center}
+.lock img{width:88px;height:88px;border-radius:20px;box-shadow:0 10px 26px var(--shadow)}
+.lock h1{margin:6px 0 0;font-size:28px;font-weight:800}
+.lock p{margin:0;color:var(--fg2);font-size:15px}
+.lock form{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin-top:10px}
+.lock input{width:100%;font-size:17px;padding:14px 16px;border-radius:14px;border:0;background:var(--fill);text-align:center;outline:none;direction:ltr;letter-spacing:.06em}
+.lock button{background:var(--accent);color:#fff;font-weight:700;font-size:17px;padding:14px;border-radius:14px}
+.lock button:disabled{opacity:.6}
+.lock .lerr{color:#ff3b30;font-size:14px;min-height:20px}
+.lock.shake form{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="lock" id="lock">
+  <img src="icon-180.png" alt="">
+  <h1>بث</h1>
+  <p>التطبيق مقفل. أدخل كلمة المرور للمتابعة.</p>
+  <form id="lockForm" autocomplete="off">
+    <input id="lockPw" type="password" placeholder="كلمة المرور" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="current-password" aria-label="كلمة المرور">
+    <button id="lockBtn" type="submit">دخول</button>
+    <div class="lerr" id="lockErr" role="alert"></div>
+  </form>
+</div>
 <main id="view"></main>
 
 <nav id="tabbar" aria-label="التبويبات"></nav>
@@ -530,7 +552,7 @@ function relTime(t){
 }
 function vLists(){
   let h = `<div class="page"><div class="ttl-row"><h1 class="h1">القوائم</h1><button class="plus" data-act="add" aria-label="إضافة قائمة">${ICON.plus}</button></div>`;
-  if (!S.playlists.length) return h + empty(ICON.lists.replace("<svg", '<svg style="width:56px;height:56px"'), "لا توجد قوائم", "أضف رابط M3U أو استورد ملفًا من جهازك.", `<button class="get big" data-act="add" style="margin-top:12px">إضافة قائمة</button>`) + "</div>";
+  if (!S.playlists.length) return h + `<button class="mini" data-act="lock" style="float:left;margin-top:8px">قفل التطبيق</button>` + empty(ICON.lists.replace("<svg", '<svg style="width:56px;height:56px"'), "لا توجد قوائم", "أضف رابط M3U أو استورد ملفًا من جهازك.", `<button class="get big" data-act="add" style="margin-top:12px">إضافة قائمة</button>`) + "</div>";
   h += S.playlists.map((p) => {
     const gc = new Set(p.channels.map((c) => c.group)).size;
     const actions = pendingDel === p.id
@@ -540,7 +562,7 @@ function vLists(){
       <div class="meta"><div class="t">${esc(p.name)}</div><div class="sub">${fmtN(p.channels.length)} قناة · ${fmtN(gc)} مجموعة</div><small>آخر تحديث ${relTime(p.updatedAt)}</small></div>
       <div class="pla">${actions}</div></div>`;
   }).join("");
-  return h + `<p class="muted" style="font-size:13px;margin-top:16px">تُحفظ القوائم على هذا الجهاز فقط.</p></div>`;
+  return h + `<p class="muted" style="font-size:13px;margin-top:16px">تُحفظ القوائم على هذا الجهاز فقط.</p><button class="mini" data-act="lock" style="margin-top:8px">قفل التطبيق</button></div>`;
 }
 function vPlaylist(e){
   const p = S.playlists.find((x) => x.id === e.id);
@@ -723,6 +745,7 @@ document.addEventListener("click", (ev) => {
     ev.stopPropagation();
     switch (d.act){
       case "add": openSheet(); break;
+      case "lock": lockApp(); break;
       case "closeSheet": closeSheet(); break;
       case "closeSheetBg": if (ev.target === t) closeSheet(); break;
       case "submit": submitSheet(); break;
@@ -742,14 +765,49 @@ document.addEventListener("keydown", (ev) => {
   if (ev.key === "Escape"){ if ($("#sheetWrap").classList.contains("open")) closeSheet(); else if (now) closePlayer(); }
 });
 
-/* ---------- boot ---------- */
-load(); rebuild(); render();
-if (!hadSaved){
-  booting = true; render();
-  addFromUrl("قنوات عربية (تجريبية)", SAMPLE)
-    .catch(() => { save(); })
-    .finally(() => { booting = false; render(); });
+/* ---------- lock ---------- */
+const LOCK_SALT = "30477e9b7c07c149";
+const LOCK_HASH = "ddd584e9efea764328f0d34460c1cc0d7a5cec54a24aabe6d6367842ae93b701";
+const UNLOCK_KEY = "bath.unlock";
+async function derive(pw){
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode(LOCK_SALT), iterations: 150000, hash: "SHA-256" }, key, 256);
+  return [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+function unlocked(){ try { return localStorage.getItem(UNLOCK_KEY) === LOCK_HASH; } catch { return false; } }
+function startApp(){
+  $("#lock").hidden = true;
+  load(); rebuild(); render();
+}
+function lockApp(){
+  if (now) closePlayer();
+  try { localStorage.removeItem(UNLOCK_KEY); } catch {}
+  $("#view").innerHTML = ""; $("#tabbar").innerHTML = "";
+  $("#lockPw").value = ""; $("#lockErr").textContent = "";
+  $("#lock").hidden = false;
+}
+$("#lockForm").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const btn = $("#lockBtn"), pw = $("#lockPw").value.trim().toLowerCase();
+  if (!pw) return;
+  btn.disabled = true; btn.textContent = "جارٍ التحقق…";
+  let ok = false;
+  try { ok = (await derive(pw)) === LOCK_HASH; } catch {}
+  btn.disabled = false; btn.textContent = "دخول";
+  if (ok){
+    try { localStorage.setItem(UNLOCK_KEY, LOCK_HASH); } catch {}
+    startApp();
+  } else {
+    $("#lockErr").textContent = "كلمة المرور غير صحيحة.";
+    const l = $("#lock"); l.classList.remove("shake"); void l.offsetWidth; l.classList.add("shake");
+    $("#lockPw").select();
+  }
+});
+
+/* ---------- boot ---------- */
+if (unlocked()) startApp();
+else $("#lockPw").focus();
 </script>
 </body>
 </html>
