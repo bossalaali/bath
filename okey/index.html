@@ -58,6 +58,9 @@ button{font-family:var(--body);cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));outline-offset:2px}
 .q{border:1px solid var(--line);background:var(--chip);color:var(--minus);font-weight:700;font-size:16px;border-radius:9px;padding:10px 0;direction:ltr;font-variant-numeric:tabular-nums}
 .q:active{transform:translateY(1px)}
+.mult{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.m{border:1px solid color-mix(in srgb,var(--c) 35%,var(--line));background:transparent;color:var(--ink);font-weight:700;font-size:15px;border-radius:9px;padding:7px 0;direction:ltr}
+.m[aria-pressed="true"]{background:var(--c);color:var(--tile);border-color:var(--c)}
 .custom{display:flex;gap:6px}
 .custom input{flex:1;min-width:0;font:600 16px var(--body);text-align:center;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--ink);padding:9px 6px;font-variant-numeric:tabular-nums}
 .op{flex:none;width:46px;border-radius:9px;border:0;font-size:20px;font-weight:700;color:var(--tile)}
@@ -96,7 +99,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
       <h1>حاسبة أوكي</h1>
       <div class="sub">اكتب أسماء اللاعبين، واضغط الخصم مباشرة أو أدخل رقمك الخاص.</div>
     </div>
-    <div class="round">عدد الحركات: <b id="moves">0</b></div>
+    <div class="round">عدد الأدوار: <b id="rounds">0</b> · الحركات: <b id="moves">0</b></div>
   </header>
 
   <section class="grid" id="grid"></section>
@@ -142,6 +145,7 @@ grid.innerHTML=state.names.map((_,i)=>`
    <input class="name" id="p${i+1}name" list="saved" autocomplete="off" aria-label="اسم اللاعب ${i+1}" maxlength="20"></div>
   <div class="score" id="s${i}">0</div>
   <div class="quick">${[10,20,40,80].map(v=>`<button class="q" type="button" data-p="${i}" data-v="-${v}">−${v}</button>`).join("")}</div>
+  <div class="mult" role="group" aria-label="مضاعفة">${[1,2,4].map(m=>`<button class="m" type="button" data-p="${i}" data-m="${m}" aria-pressed="${m===1}">×${m}</button>`).join("")}</div>
   <div class="custom">
    <button class="op plus" type="button" data-p="${i}" data-op="1" aria-label="إضافة">+</button>
    <input id="p${i+1}custom" type="number" inputmode="numeric" placeholder="رقم" aria-label="رقم مخصص للاعب ${i+1}">
@@ -169,8 +173,11 @@ document.getElementById("chips").addEventListener("click",e=>{const b=e.target.c
   const n=state.roster[+b.dataset.pick];const el=document.getElementById(`p${target+1}name`);
   el.value=n;state.names[target]=n;save();renderLog();setTarget((target+1)%4);});
 
-function apply(p,v){if(!v)return;state.scores[p]+=v;state.log.push({p,v});save();render(p);}
+const mult=[1,1,1,1];
+function setMult(p,m){mult[p]=m;document.querySelectorAll(`.m[data-p="${p}"]`).forEach(x=>x.setAttribute("aria-pressed",+x.dataset.m===m));}
+function apply(p,v){if(!v)return;const m=mult[p];v*=m;state.scores[p]+=v;state.log.push({p,v,m});setMult(p,1);save();render(p);}
 grid.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const p=+b.dataset.p;
+  if(b.dataset.m){setMult(p,mult[p]===+b.dataset.m?1:+b.dataset.m);return;}
   if(b.dataset.v)apply(p,+b.dataset.v);
   if(b.dataset.op){const inp=document.getElementById(`p${p+1}custom`);const n=Math.abs(parseInt(inp.value,10));
     if(n){apply(p,n*+b.dataset.op);inp.value="";}else inp.focus();}});
@@ -185,10 +192,11 @@ function render(bumped){
     document.getElementById("t"+i).classList.toggle("lead",lead);b.hidden=!(lead||lose);
     if(i===bumped){el.classList.add("bump");setTimeout(()=>el.classList.remove("bump"),160);}});
   document.getElementById("moves").textContent=state.log.length;
+  document.getElementById("rounds").textContent=Math.floor(state.log.length/4);
   document.getElementById("undo").disabled=!anyMove;renderLog();}
 function renderLog(){
   const ol=document.getElementById("log");
-  ol.innerHTML=state.log.slice().reverse().slice(0,60).map(m=>`<li><span>${esc(state.names[m.p]||"لاعب "+(m.p+1))}</span><span style="color:${m.v<0?"var(--on-felt)":"var(--on-felt)"}">${fmt(m.v)}</span></li>`).join("");
+  ol.innerHTML=state.log.slice().reverse().slice(0,60).map(m=>`<li><span>${esc(state.names[m.p]||"لاعب "+(m.p+1))}</span><span style="color:${m.v<0?"var(--on-felt)":"var(--on-felt)"}">${m.m>1?`<small style="opacity:.7">×${m.m}</small> `:""}${fmt(m.v)}</span></li>`).join("");
   document.getElementById("empty").hidden=state.log.length>0;}
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
