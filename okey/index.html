@@ -99,7 +99,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
       <h1>حاسبة أوكي</h1>
       <div class="sub">اكتب أسماء اللاعبين، واضغط الخصم مباشرة أو أدخل رقمك الخاص.</div>
     </div>
-    <div class="round">عدد الأدوار: <b id="rounds">0</b> · الحركات: <b id="moves">0</b></div>
+    <div class="round"><b id="rounds">الدور الأول</b> · الحركات: <b id="moves">0</b></div>
   </header>
 
   <section class="grid" id="grid"></section>
@@ -192,7 +192,9 @@ function render(bumped){
     document.getElementById("t"+i).classList.toggle("lead",lead);b.hidden=!(lead||lose);
     if(i===bumped){el.classList.add("bump");setTimeout(()=>el.classList.remove("bump"),160);}});
   document.getElementById("moves").textContent=state.log.length;
-  document.getElementById("rounds").textContent=Math.floor(state.log.length/4);
+  const ORD=["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر","الحادي عشر","الثاني عشر","الثالث عشر","الرابع عشر","الخامس عشر","السادس عشر","السابع عشر","الثامن عشر","التاسع عشر","العشرون"];
+  const r=Math.floor(state.log.length/4);
+  document.getElementById("rounds").textContent="الدور "+(ORD[r]||(r+1));
   document.getElementById("undo").disabled=!anyMove;renderLog();}
 function renderLog(){
   const ol=document.getElementById("log");
