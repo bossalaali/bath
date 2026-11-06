@@ -246,7 +246,7 @@ grid.innerHTML=state.names.map((_,i)=>`
  <article class="tile" id="t${i}" style="--c:var(${COLORS[i]})">
   <span class="badge" id="b${i}" hidden>المتصدر</span>
   <div class="head"><span class="pip"></span>
-   <input class="name" id="p${i+1}name" list="saved" autocomplete="off" aria-label="اسم اللاعب ${i+1}" maxlength="20"></div>
+   <input class="name" id="p${i+1}name" list="saved" autocomplete="off" enterkeyhint="${i<3?"next":"done"}" aria-label="اسم اللاعب ${i+1}" maxlength="20"></div>
   <div class="score" id="s${i}">0</div>
   <div class="ctl">
    <button class="bonus" type="button" data-p="${i}" data-bonus="1">بونس بداية الدور <b>−10</b></button>
@@ -263,7 +263,7 @@ grid.innerHTML=state.names.map((_,i)=>`
   </div>
   <div class="pend" id="pend${i}" hidden>
    <label for="p${i+1}left">مجموع أحجاره الباقية</label>
-   <div class="pend-in"><input id="p${i+1}left" type="number" inputmode="numeric" min="0" placeholder="0"><span class="calc" id="calc${i}"></span></div>
+   <div class="pend-in"><input id="p${i+1}left" type="number" inputmode="numeric" enterkeyhint="next" min="0" placeholder="0"><span class="calc" id="calc${i}"></span></div>
   </div>
   <div class="winner-note" id="wn${i}" hidden></div>
  </article>`).join("");
@@ -271,10 +271,16 @@ grid.innerHTML=state.names.map((_,i)=>`
 if(!Array.isArray(state.roster))state.roster=[];
 const isDefault=n=>/^لاعب\s*[١٢٣٤1-4]$/.test(n.trim());
 let target=0;
+let nameT=null;
+function nextName(i){clearTimeout(nameT);const cur=document.getElementById(`p${i+1}name`);remember(cur.value);
+  if(i<3){const el=document.getElementById(`p${i+2}name`);el.focus({preventScroll:true});el.select();el.closest(".tile").scrollIntoView({behavior:"smooth",block:"center"});}
+  else cur.blur();}
 function remember(n){n=(n||"").trim();if(!n||isDefault(n)||state.roster.includes(n))return;state.roster.push(n);save();renderRoster();}
 function setTarget(i){target=i;document.querySelectorAll(".tile").forEach((t,k)=>t.classList.toggle("target",k===i));}
 state.names.forEach((n,i)=>{const el=document.getElementById(`p${i+1}name`);el.value=n;remember(n);
-  el.addEventListener("input",()=>{state.names[i]=el.value;save();renderLog();});
+  el.addEventListener("input",()=>{state.names[i]=el.value;save();renderLog();
+    clearTimeout(nameT);if(el.value.trim())nameT=setTimeout(()=>{if(document.activeElement===el)nextName(i);},2000);});
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();nextName(i);}});
   el.addEventListener("change",()=>remember(el.value));
   el.addEventListener("focus",()=>setTarget(i));
   document.getElementById("t"+i).addEventListener("pointerdown",()=>setTarget(i));});
@@ -309,7 +315,14 @@ function renderPending(){
     if(isW)wn.innerHTML=`<div class="wn-t">${WINS[-pending.v].t} <span class="num">${pending.v}</span></div><div class="wn-s">دخّل مجموع أحجار الباقين${pending.m>1?`، وتنضرب ×${pending.m} من نفسها`:""}</div>`;
     if(pending&&!isW){const n=leftVal(i);document.getElementById("calc"+i).textContent=pending.m>1?`×${pending.m} = +${n*pending.m}`:`= +${n}`;}});
   if(pending)document.getElementById("pendText").innerHTML=`${esc(nm(pending.w))} ${WINS[-pending.v].t} <bdi dir="ltr">${pending.v}</bdi>. دخّل مجموع أحجار الباقين${pending.m>1?` وتنضرب ×${pending.m} تلقائياً`:""}.`;}
-grid.addEventListener("input",e=>{if(e.target.id&&e.target.id.endsWith("left"))renderPending();});
+let advT=null;
+function order(){return pending?[0,1,2,3].filter(k=>k!==pending.w):[];}
+function goNext(i){const o=order(),k=o.indexOf(i);clearTimeout(advT);
+  if(k>-1&&k<o.length-1){const el=document.getElementById(`p${o[k+1]+1}left`);el.focus({preventScroll:true});
+    el.closest(".tile").scrollIntoView({behavior:"smooth",block:"center"});}
+  else{document.activeElement&&document.activeElement.blur();document.getElementById("fOk").focus({preventScroll:true});}}
+grid.addEventListener("input",e=>{if(!e.target.id||!e.target.id.endsWith("left"))return;renderPending();
+  clearTimeout(advT);const i=+e.target.id[1]-1;if(e.target.value!=="")advT=setTimeout(()=>{if(document.activeElement===e.target)goNext(i);},1500);});
 function finishRound(){if(!pending)return;const g=gid();
   push(pending.w,pending.v,"win",g);
   [0,1,2,3].forEach(i=>{if(i===pending.w)return;const n=leftVal(i);if(n)push(i,n*pending.m,"pts",g,pending.m);});
@@ -328,8 +341,7 @@ grid.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||role
   if(b.dataset.op){const inp=document.getElementById(`p${p+1}custom`);const n=Math.abs(parseInt(toLatin(inp.value),10));
     if(n){push(p,n*+b.dataset.op,"adj",gid());inp.value="";save();render(p);}else inp.focus();}});
 grid.addEventListener("keydown",e=>{if(e.key!=="Enter"||!e.target.id)return;
-  if(e.target.id.endsWith("left")){const i=+e.target.id[1]-1;const nx=[1,2,3].map(k=>(i+k)%4).find(k=>pending&&k!==pending.w&&k!==i);
-    const order=[0,1,2,3].filter(k=>pending&&k!==pending.w);if(order.indexOf(i)===order.length-1)finishRound();else document.getElementById(`p${order[order.indexOf(i)+1]+1}left`).focus();}
+  if(e.target.id.endsWith("left")){e.preventDefault();goNext(+e.target.id[1]-1);}
   if(e.target.id.endsWith("custom"))e.target.closest(".custom").querySelector(".minus").click();});
 
 ORD=["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر","الحادي عشر","الثاني عشر","الثالث عشر","الرابع عشر","الخامس عشر","السادس عشر","السابع عشر","الثامن عشر","التاسع عشر","العشرون"];
