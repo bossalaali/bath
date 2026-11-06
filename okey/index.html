@@ -87,19 +87,24 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
 .chip button{border:0;background:transparent;color:inherit;font-size:15px;padding:8px 12px}
 .chip .x{padding:8px 10px;color:var(--muted);border-inline-start:1px solid var(--line)}
 .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 0 0 3px var(--c),0 10px 22px rgba(0,0,0,.28)}
-.session{margin-bottom:16px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.ses-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.ses-row{display:flex;flex-direction:column;gap:6px;min-width:0}
-.ses-row label{font-size:14px;color:var(--on-felt-muted)}
+.session{margin-bottom:18px;background:var(--tile);color:var(--ink);border:2px solid var(--yellow);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,0,0,.28)}
+.ses-title{font-family:var(--display);font-size:20px;font-weight:700;margin:0}
+.ses-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.ses-row{display:flex;flex-direction:column;gap:8px;min-width:0;background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px}
+.ses-row label{font-size:16px;font-weight:700;color:var(--ink)}
 .ses-in{display:flex;gap:8px;flex-wrap:wrap}
-.ses-in input{flex:1;min-width:110px;font:700 20px var(--body);letter-spacing:.3em;text-align:center;direction:ltr;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:var(--on-felt);padding:8px}
-.ses-in input::placeholder{letter-spacing:0;font-size:15px;color:var(--on-felt-muted)}
+.ses-in input{flex:1;min-width:120px;font:700 30px var(--body);letter-spacing:.35em;text-align:center;direction:ltr;border-radius:12px;border:2px solid var(--line);background:var(--tile);color:var(--ink);padding:10px 8px}
+.ses-in input:focus{border-color:var(--yellow);outline:none}
+.ses-in input::placeholder{letter-spacing:0;font-size:16px;font-weight:500;color:var(--muted)}
+.session .btn{color:var(--ink);border-color:var(--line);background:var(--tile);font-size:16px;padding:12px 18px}
+.session .btn.go{background:var(--plus);color:#fff;border-color:transparent}
+.session .btn.watch{background:var(--blue);color:#fff;border-color:transparent}
 .btn.solid{background:var(--tile);color:var(--ink);border-color:transparent}
-.live{display:flex;align-items:center;gap:10px;font-size:16px;flex-wrap:wrap}
-.live b{font-size:22px;letter-spacing:.15em;direction:ltr;font-variant-numeric:tabular-nums}
+.live{display:flex;align-items:center;gap:10px;font-size:17px;flex-wrap:wrap}
+.live b{font-size:34px;color:var(--yellow);letter-spacing:.15em;direction:ltr;font-variant-numeric:tabular-nums}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--plus);box-shadow:0 0 0 4px color-mix(in srgb,var(--plus) 30%,transparent)}
 .dot.off{background:var(--yellow);box-shadow:none}
-.ses-msg{font-size:14px;color:var(--on-felt-muted)}
+.ses-msg{font-size:15px;color:var(--muted)}
 .ses-msg:empty{display:none}
 body.viewer .quick,body.viewer .mult,body.viewer .custom,body.viewer .roster,body.viewer .actions{display:none}
 body.viewer .panel{grid-template-columns:1fr}
@@ -112,20 +117,13 @@ body.viewer .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,
 <body>
 
 <div class="wrap" dir="rtl" lang="ar">
-  <header>
-    <div>
-      <h1>حاسبة أوكي</h1>
-      <div class="sub" id="subline">اكتب أسماء اللاعبين، واضغط الخصم مباشرة أو أدخل رقمك الخاص.</div>
-    </div>
-    <div class="round"><b id="rounds">الدور الأول</b> · الحركات: <b id="moves">0</b></div>
-  </header>
-
   <section class="session" id="session">
+    <h2 class="ses-title" id="sesTitle">كود الجلسة</h2>
     <div class="ses-grid" id="sesIdle">
       <div class="ses-row"><label for="hostCode">ابدأ جلسة وتحكم أنت بالنقاط</label>
-        <div class="ses-in"><input id="hostCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="اختار كود ٤ أرقام"><button class="btn solid" id="startBtn" type="button">ابدأ الجلسة</button></div></div>
+        <div class="ses-in"><input id="hostCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="اختار كود ٤ أرقام"><button class="btn go" id="startBtn" type="button">ابدأ الجلسة</button></div></div>
       <div class="ses-row"><label for="joinCode">أو ادخل كمشاهد بكود الجلسة</label>
-        <div class="ses-in"><input id="joinCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="كود الجلسة"><button class="btn" id="joinBtn" type="button">شاهد النتائج</button></div></div>
+        <div class="ses-in"><input id="joinCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="كود الجلسة"><button class="btn watch" id="joinBtn" type="button">شاهد النتائج</button></div></div>
     </div>
     <div id="sesLive" hidden>
       <div class="ses-in" style="justify-content:space-between;align-items:center">
@@ -135,6 +133,15 @@ body.viewer .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,
     </div>
     <div class="ses-msg" id="sesMsg"></div>
   </section>
+
+  <header>
+    <div>
+      <h1>حاسبة أوكي</h1>
+      <div class="sub" id="subline">اكتب أسماء اللاعبين، واضغط الخصم مباشرة أو أدخل رقمك الخاص.</div>
+    </div>
+    <div class="round"><b id="rounds">الدور الأول</b> · الحركات: <b id="moves">0</b></div>
+  </header>
+
 
   <section class="grid" id="grid"></section>
 
