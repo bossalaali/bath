@@ -87,6 +87,24 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
 .chip button{border:0;background:transparent;color:inherit;font-size:15px;padding:8px 12px}
 .chip .x{padding:8px 10px;color:var(--muted);border-inline-start:1px solid var(--line)}
 .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 0 0 3px var(--c),0 10px 22px rgba(0,0,0,.28)}
+.session{margin-bottom:16px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.ses-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.ses-row{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ses-row label{font-size:14px;color:var(--on-felt-muted)}
+.ses-in{display:flex;gap:8px;flex-wrap:wrap}
+.ses-in input{flex:1;min-width:110px;font:700 20px var(--body);letter-spacing:.3em;text-align:center;direction:ltr;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:var(--on-felt);padding:8px}
+.ses-in input::placeholder{letter-spacing:0;font-size:15px;color:var(--on-felt-muted)}
+.btn.solid{background:var(--tile);color:var(--ink);border-color:transparent}
+.live{display:flex;align-items:center;gap:10px;font-size:16px;flex-wrap:wrap}
+.live b{font-size:22px;letter-spacing:.15em;direction:ltr;font-variant-numeric:tabular-nums}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--plus);box-shadow:0 0 0 4px color-mix(in srgb,var(--plus) 30%,transparent)}
+.dot.off{background:var(--yellow);box-shadow:none}
+.ses-msg{font-size:14px;color:var(--on-felt-muted)}
+.ses-msg:empty{display:none}
+body.viewer .quick,body.viewer .mult,body.viewer .custom,body.viewer .roster,body.viewer .actions{display:none}
+body.viewer .panel{grid-template-columns:1fr}
+body.viewer .name{border-bottom-color:transparent;pointer-events:none}
+body.viewer .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,0,0,.28)}
 @media (prefers-reduced-motion:reduce){.score{transition:none}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
@@ -97,10 +115,26 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
   <header>
     <div>
       <h1>حاسبة أوكي</h1>
-      <div class="sub">اكتب أسماء اللاعبين، واضغط الخصم مباشرة أو أدخل رقمك الخاص.</div>
+      <div class="sub" id="subline">اكتب أسماء اللاعبين، واضغط الخصم مباشرة أو أدخل رقمك الخاص.</div>
     </div>
     <div class="round"><b id="rounds">الدور الأول</b> · الحركات: <b id="moves">0</b></div>
   </header>
+
+  <section class="session" id="session">
+    <div class="ses-grid" id="sesIdle">
+      <div class="ses-row"><label for="hostCode">ابدأ جلسة وتحكم أنت بالنقاط</label>
+        <div class="ses-in"><input id="hostCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="اختار كود ٤ أرقام"><button class="btn solid" id="startBtn" type="button">ابدأ الجلسة</button></div></div>
+      <div class="ses-row"><label for="joinCode">أو ادخل كمشاهد بكود الجلسة</label>
+        <div class="ses-in"><input id="joinCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="كود الجلسة"><button class="btn" id="joinBtn" type="button">شاهد النتائج</button></div></div>
+    </div>
+    <div id="sesLive" hidden>
+      <div class="ses-in" style="justify-content:space-between;align-items:center">
+        <div class="live"><span class="dot" id="dot"></span><span id="sesText"></span></div>
+        <div class="ses-in"><button class="btn" id="copyBtn" type="button" hidden>نسخ رابط المشاهدة</button><button class="btn" id="stopBtn" type="button">إنهاء</button></div>
+      </div>
+    </div>
+    <div class="ses-msg" id="sesMsg"></div>
+  </section>
 
   <section class="grid" id="grid"></section>
 
@@ -129,12 +163,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
   </section>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const COLORS=["--red","--blue","--black","--yellow"];
 const KEY="okey-score-v1";
 let state={names:["لاعب ١","لاعب ٢","لاعب ٣","لاعب ٤"],scores:[0,0,0,0],log:[]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.scores)&&s.scores.length===4)state=s;}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+const save=()=>{if(role==="viewer")return;try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}broadcast();};
+let role=null,ORD=[];
 const fmt=n=>(n>0?"+":"")+n;
 const grid=document.getElementById("grid");
 
@@ -192,7 +228,7 @@ function render(bumped){
     document.getElementById("t"+i).classList.toggle("lead",lead);b.hidden=!(lead||lose);
     if(i===bumped){el.classList.add("bump");setTimeout(()=>el.classList.remove("bump"),160);}});
   document.getElementById("moves").textContent=state.log.length;
-  const ORD=["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر","الحادي عشر","الثاني عشر","الثالث عشر","الرابع عشر","الخامس عشر","السادس عشر","السابع عشر","الثامن عشر","التاسع عشر","العشرون"];
+  ORD=["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر","الحادي عشر","الثاني عشر","الثالث عشر","الرابع عشر","الخامس عشر","السادس عشر","السابع عشر","الثامن عشر","التاسع عشر","العشرون"];
   const r=Math.floor(state.log.length/4);
   document.getElementById("rounds").textContent="الدور "+(ORD[r]||(r+1));
   document.getElementById("undo").disabled=!anyMove;renderLog();}
@@ -208,6 +244,77 @@ document.getElementById("reset").onclick=()=>{conf.hidden=false;};
 document.getElementById("no").onclick=()=>{conf.hidden=true;};
 document.getElementById("yes").onclick=()=>{state.scores=[0,0,0,0];state.log=[];save();conf.hidden=true;render();};
 render();renderRoster();setTarget(0);
+
+/* ---- live session (host controls, viewers watch with a 4-digit code) ---- */
+const PREFIX="okey-bh-bossalaali-v1-";
+let peer=null,conns=[],code=null,hostConn=null,retryT=null,tries=0;
+const $=id=>document.getElementById(id);
+const toLatin=s=>(s||"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).trim();
+const msg=t=>{$("sesMsg").textContent=t||"";};
+function snapshot(){return {names:state.names,scores:state.scores,log:state.log.slice(-60),moves:state.log.length};}
+function broadcast(){if(role!=="host")return;const d=snapshot();conns=conns.filter(c=>c.open);conns.forEach(c=>{try{c.send(d)}catch(e){}});liveUI();}
+function liveUI(){
+  $("sesIdle").hidden=!!role;$("sesLive").hidden=!role;
+  if(role==="host"){const n=conns.filter(c=>c.open).length;
+    $("sesText").innerHTML=`أنت المتحكم · كود الجلسة <b>${code}</b> · المشاهدين: ${n}`;$("copyBtn").hidden=false;}
+  if(role==="viewer"){$("sesText").innerHTML=`تشاهد الجلسة <b>${code}</b>`;$("copyBtn").hidden=true;}
+}
+function stopAll(){clearTimeout(retryT);conns=[];hostConn=null;if(peer){try{peer.destroy()}catch(e){}}peer=null;}
+function startHost(c,auto){
+  c=toLatin(c);if(!/^\d{4}$/.test(c)){msg("الكود لازم يكون ٤ أرقام.");return;}
+  if(typeof Peer==="undefined"){msg("ما قدرت أحمّل خدمة الجلسات. تأكد من الإنترنت وحدّث الصفحة.");return;}
+  stopAll();role="host";code=c;liveUI();$("dot").classList.add("off");msg(auto?"جاري استرجاع الجلسة…":"جاري تشغيل الجلسة…");
+  peer=new Peer(PREFIX+c,{debug:0});
+  peer.on("open",()=>{tries=0;try{localStorage.setItem(KEY+"-host",c)}catch(e){}$("dot").classList.remove("off");msg("شارك الكود أو رابط المشاهدة مع الباقين. لازم تخلي هذي الصفحة مفتوحة عشان يشوفون النتائج.");liveUI();});
+  peer.on("connection",cn=>{cn.on("open",()=>{conns.push(cn);try{cn.send(snapshot())}catch(e){}liveUI();});
+    cn.on("data",()=>{});/* viewers can never change scores */
+    cn.on("close",()=>{conns=conns.filter(x=>x!==cn);liveUI();});});
+  peer.on("disconnected",()=>{$("dot").classList.add("off");try{peer.reconnect()}catch(e){}});
+  peer.on("error",err=>{
+    if(err.type==="unavailable-id"){
+      if(auto&&tries<6){tries++;msg("جاري استرجاع الجلسة…");retryT=setTimeout(()=>startHost(c,true),4000);}
+      else{stopAll();role=null;liveUI();msg("هذا الكود مستخدم في جلسة ثانية الحين. اختار كود غيره.");}
+    }else{$("dot").classList.add("off");msg("في مشكلة في الاتصال. تأكد من الإنترنت.");}
+  });
+}
+function join(c){
+  c=toLatin(c);if(!/^\d{4}$/.test(c)){msg("اكتب كود الجلسة: ٤ أرقام.");return;}
+  if(typeof Peer==="undefined"){msg("ما قدرت أحمّل خدمة الجلسات. تأكد من الإنترنت وحدّث الصفحة.");return;}
+  stopAll();role="viewer";code=c;document.body.classList.add("viewer");
+  document.querySelectorAll(".name").forEach(el=>el.readOnly=true);
+  $("subline").textContent="أنت تشاهد فقط. صاحب الجلسة هو اللي يسجل النقاط.";
+  liveUI();$("dot").classList.add("off");msg("جاري الاتصال بالجلسة…");
+  peer=new Peer({debug:0});
+  peer.on("open",connect);
+  peer.on("disconnected",()=>{try{peer.reconnect()}catch(e){}});
+  peer.on("error",err=>{$("dot").classList.add("off");
+    msg(err.type==="peer-unavailable"?"ما لقيت جلسة بهذا الكود. تأكد من الكود، وإن صاحب الجلسة فاتح الصفحة. بحاول مرة ثانية…":"في مشكلة في الاتصال. بحاول مرة ثانية…");schedule();});
+}
+function connect(){if(role!=="viewer"||!peer||peer.destroyed)return;
+  hostConn=peer.connect(PREFIX+code,{reliable:true});
+  hostConn.on("open",()=>{$("dot").classList.remove("off");msg("");});
+  hostConn.on("data",d=>{if(!d||!Array.isArray(d.scores)||d.scores.length!==4)return;
+    state.names=[0,1,2,3].map(i=>String((d.names||[])[i]??"").slice(0,20));
+    state.scores=d.scores.map(x=>Number(x)||0);
+    state.log=(Array.isArray(d.log)?d.log:[]).map(m=>({p:Math.min(3,Math.max(0,m.p|0)),v:Number(m.v)||0,m:Number(m.m)||1}));
+    state.names.forEach((n,i)=>{$(`p${i+1}name`).value=n;});
+    render();if(d.moves!=null){const r=Math.floor(d.moves/4);$("moves").textContent=d.moves;$("rounds").textContent="الدور "+(ORD[r]||(r+1));}});
+  hostConn.on("close",()=>{$("dot").classList.add("off");msg("انقطع الاتصال بالجلسة. بحاول مرة ثانية…");schedule();});
+}
+function schedule(){clearTimeout(retryT);retryT=setTimeout(connect,3000);}
+$("startBtn").onclick=()=>startHost($("hostCode").value,false);
+$("joinBtn").onclick=()=>join($("joinCode").value);
+$("hostCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("startBtn").click();});
+$("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("joinBtn").click();});
+$("stopBtn").onclick=()=>{if(role==="host"){try{localStorage.removeItem(KEY+"-host")}catch(e){}stopAll();role=null;liveUI();msg("انتهت الجلسة.");}
+  else{stopAll();location.hash="";location.reload();}};
+$("copyBtn").onclick=()=>{const u=location.origin+location.pathname+"#"+code;
+  const done=()=>msg("انتسخ الرابط: "+u);
+  if(navigator.clipboard)navigator.clipboard.writeText(u).then(done,()=>msg("رابط المشاهدة: "+u));else msg("رابط المشاهدة: "+u);};
+(function boot(){const hm=toLatin(decodeURIComponent(location.hash.slice(1)));
+  if(/^\d{4}$/.test(hm)){join(hm);return;}
+  let saved=null;try{saved=localStorage.getItem(KEY+"-host")}catch(e){}
+  if(saved&&/^\d{4}$/.test(saved))startHost(saved,true);})();
 </script>
 </body>
 </html>
