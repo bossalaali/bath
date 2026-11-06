@@ -116,6 +116,25 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
 .wn-act .yes{background:var(--plus);color:#fff;border-color:transparent}
 .wn-act .nope{background:transparent;color:var(--ink)}
 body.viewer .wn-act,body.viewer .wn-s{display:none}
+.btn.final{background:var(--yellow);color:#1b1608;border-color:transparent;font-weight:700}
+.rank{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;
+  padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:auto}
+.rank-in{width:100%;max-width:460px;background:var(--tile);color:var(--ink);border-radius:18px;padding:20px 16px;box-shadow:0 20px 50px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:12px;animation:pop .25s ease-out}
+.rank h2{font-family:var(--display);font-size:28px;margin:0;text-align:center}
+.rank-sub{text-align:center;color:var(--muted);font-size:14px}
+.rank-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.rank-list li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;
+  background:color-mix(in srgb,var(--c) 14%,var(--tile));border:2px solid color-mix(in srgb,var(--c) 50%,var(--tile-edge))}
+.rank-list .pos{font-family:var(--display);font-weight:700;font-size:15px;min-width:64px;text-align:center;padding:4px 8px;border-radius:999px;background:var(--c);color:var(--tile)}
+.rank-list .who{font-family:var(--display);font-weight:700;font-size:24px;min-width:0;overflow-wrap:anywhere}
+.rank-list .pts{font-weight:700;font-size:24px;color:var(--c);direction:ltr;font-variant-numeric:tabular-nums}
+.rank-list li.first{transform:scale(1.03);border-width:3px}
+.rank-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rank .btn.back{color:var(--ink);background:transparent;border-color:var(--line)}
+body.viewer .rank-act{display:none}
+@keyframes pop{from{transform:scale(.94);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.rank-in{animation:none}}
 .fbar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   background:var(--tile);color:var(--ink);border-top:3px solid var(--plus);box-shadow:0 -8px 24px rgba(0,0,0,.22);animation:fup .2s ease-out}
@@ -196,6 +215,14 @@ body.viewer .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,
 
 
   <div class="roundbig" id="roundBig">الدور الأول</div>
+  <div class="rank" id="rank" hidden role="dialog" aria-labelledby="rankTitle">
+    <div class="rank-in">
+      <h2 id="rankTitle">الترتيب النهائي</h2>
+      <div class="rank-sub" id="rankSub"></div>
+      <ol class="rank-list" id="rankList"></ol>
+      <div class="rank-act"><button class="btn back" id="rankBack" type="button">رجوع للعبة</button><button class="btn danger" id="rankNew" type="button">لعبة جديدة</button></div>
+    </div>
+  </div>
   <div class="fbar" id="fbar" hidden><div class="fbar-in"><span id="fbarText"></span><div class="wn-act"><button class="yes" type="button" id="fOk">سجّل الدور</button><button class="nope" type="button" id="fCancel">إلغاء</button></div></div></div>
   <div class="pendbar" id="pendBar" hidden><span id="pendText"></span><div class="pend-act"><button class="btn go" id="pendOk" type="button">سجّل الدور</button><button class="btn" id="pendCancel" type="button">إلغاء</button></div></div>
 
@@ -216,6 +243,7 @@ body.viewer .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,
       <div class="empty" id="empty">لا توجد حركات بعد. أول خصم يظهر هنا.</div>
     </div>
     <div class="actions">
+      <button class="btn final" id="finalBtn" type="button">إنهاء اللعبة وعرض الترتيب</button>
       <button class="btn" id="undo" type="button">تراجع عن آخر حركة</button>
       <button class="btn danger" id="reset" type="button">لعبة جديدة</button>
       <div class="confirm" id="confirm" hidden>
@@ -379,7 +407,22 @@ const PREFIX="okey-bh-bossalaali-v2-";
 let peer=null,conns=[],code=null,hostConn=null,retryT=null,tries=0;
 const $=id=>document.getElementById(id);
 const msg=t=>{$("sesMsg").textContent=t||"";};
-function snapshot(){return {names:state.names,scores:state.scores,log:state.log.slice(-60),round:state.round,pending:pending?{w:pending.w,v:pending.v,m:pending.m}:null};}
+
+var final=false;
+const POS=["الأول","الثاني","الثالث","الأخير"];
+function renderRank(){
+  const el=document.getElementById("rank");el.hidden=!final;if(!final)return;
+  const order=[0,1,2,3].sort((a,b)=>state.scores[a]-state.scores[b]||a-b);
+  let prev=null,place=0;
+  document.getElementById("rankList").innerHTML=order.map((p,k)=>{const s=state.scores[p];if(s!==prev){place=k;prev=s;}
+    const mx=Math.max(...state.scores),mn=Math.min(...state.scores);const label=(s===mx&&mx!==mn)?POS[3]:POS[Math.min(place,2)];
+    return `<li class="${place===0?"first":""}" style="--c:var(${COLORS[p]})"><span class="pos">${label}</span><span class="who">${esc(nm(p))}</span><span class="pts">${s}</span></li>`;}).join("");
+  const r=state.round,rt=r===0?"قبل أي دور":r===1?"بعد دور واحد":r===2?"بعد دورين":`بعد ${r} ${r<=10?"أدوار":"دور"}`;
+  document.getElementById("rankSub").textContent=`${rt} · الأقل نقاط هو الفايز`;}
+document.getElementById("finalBtn").onclick=()=>{if(pending){pending=null;renderPending();}final=true;renderRank();broadcast();};
+document.getElementById("rankBack").onclick=()=>{final=false;renderRank();broadcast();};
+document.getElementById("rankNew").onclick=()=>{final=false;renderRank();document.getElementById("yes").click();};
+function snapshot(){return {names:state.names,scores:state.scores,log:state.log.slice(-60),round:state.round,final:final,pending:pending?{w:pending.w,v:pending.v,m:pending.m}:null};}
 function broadcast(){if(role!=="host")return;const d=snapshot();conns=conns.filter(c=>c.open);conns.forEach(c=>{try{c.send(d)}catch(e){}});liveUI();}
 function liveUI(){
   $("sesIdle").hidden=!!role;$("sesLive").hidden=!role;
@@ -425,10 +468,10 @@ function connect(){if(role!=="viewer"||!peer||peer.destroyed)return;
     state.names=[0,1,2,3].map(i=>String((d.names||[])[i]??"").slice(0,20));
     state.scores=d.scores.map(x=>Number(x)||0);
     state.log=(Array.isArray(d.log)?d.log:[]).map(m=>({p:Math.min(3,Math.max(0,m.p|0)),v:Number(m.v)||0,m:Number(m.m)||1,kind:String(m.kind||""),g:m.g}));
-    state.round=Math.max(0,d.round|0);
+    state.round=Math.max(0,d.round|0);final=!!d.final;
     pending=d.pending&&WINS[-d.pending.v]?{w:Math.min(3,Math.max(0,d.pending.w|0)),v:Number(d.pending.v),m:WINS[-d.pending.v].m}:null;
     state.names.forEach((n,i)=>{$(`p${i+1}name`).value=n;});
-    render();renderPending();});
+    render();renderPending();renderRank();});
   hostConn.on("close",()=>{$("dot").classList.add("off");msg("انقطع الاتصال بالجلسة. بحاول مرة ثانية…");schedule();});
 }
 function schedule(){clearTimeout(retryT);retryT=setTimeout(connect,3000);}
