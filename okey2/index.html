@@ -109,7 +109,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
 .pend-in{display:flex;align-items:center;gap:10px}
 .pend-in input{flex:1;min-width:0;font:700 24px var(--body);text-align:center;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);padding:8px}
 .calc{font-weight:700;font-size:17px;color:var(--c);direction:ltr;white-space:nowrap;font-variant-numeric:tabular-nums}
-.winner-note{text-align:center;font-family:var(--display);font-weight:700;font-size:20px;color:var(--c);background:var(--tile);border-radius:10px;padding:10px}
+.winner-note .wn-s{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);margin-top:4px}
+.num{display:inline-block;direction:ltr;unicode-bidi:isolate}
+.wn-act{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.wn-act button{border-radius:10px;padding:12px 6px;font:700 16px var(--body);border:1px solid var(--line)}
+.wn-act .yes{background:var(--plus);color:#fff;border-color:transparent}
+.wn-act .nope{background:transparent;color:var(--ink)}
+body.viewer .wn-act,body.viewer .wn-s{display:none}
+.winner-note{border:2px solid var(--c);text-align:center;font-family:var(--display);font-weight:700;font-size:20px;color:var(--c);background:var(--tile);border-radius:10px;padding:10px}
 body.pending .ctl{display:none}
 .pendbar{margin:0 0 16px;background:var(--tile);color:var(--ink);border:2px solid var(--plus);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:16px;font-weight:600}
 .pend-act{display:flex;gap:8px}
@@ -283,11 +290,11 @@ function askWin(p,v){closeAsk();const c=document.getElementById("wc"+p);c.datase
 function leftVal(i){const n=parseInt(toLatin(document.getElementById(`p${i+1}left`).value),10);return Math.max(0,n||0);}
 function renderPending(){
   document.body.classList.toggle("pending",!!pending);
-  const bar=document.getElementById("pendBar");bar.hidden=!pending;
+  const bar=document.getElementById("pendBar");bar.hidden=true;
   [0,1,2,3].forEach(i=>{const isW=pending&&i===pending.w;
     document.getElementById("pend"+i).hidden=!pending||isW;
     const wn=document.getElementById("wn"+i);wn.hidden=!isW;
-    if(isW)wn.innerHTML=`${WINS[-pending.v].t} <bdi dir="ltr">${pending.v}</bdi>`;
+    if(isW)wn.innerHTML=`<div class="wn-t">${WINS[-pending.v].t} <span class="num">${pending.v}</span></div><div class="wn-s">دخّل مجموع أحجار الباقين${pending.m>1?`، وتنضرب ×${pending.m} من نفسها`:""}</div><div class="wn-act"><button class="yes" type="button" data-p="${i}" data-fin="1">سجّل الدور</button><button class="nope" type="button" data-p="${i}" data-pcancel="1">إلغاء</button></div>`;
     if(pending&&!isW){const n=leftVal(i);document.getElementById("calc"+i).textContent=pending.m>1?`×${pending.m} = +${n*pending.m}`:`= +${n}`;}});
   if(pending)document.getElementById("pendText").innerHTML=`${esc(nm(pending.w))} ${WINS[-pending.v].t} <bdi dir="ltr">${pending.v}</bdi>. دخّل مجموع أحجار الباقين${pending.m>1?` وتنضرب ×${pending.m} تلقائياً`:""}.`;}
 grid.addEventListener("input",e=>{if(e.target.id&&e.target.id.endsWith("left"))renderPending();});
@@ -302,6 +309,8 @@ grid.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||role
   if(b.dataset.win){const v=+b.dataset.win;if(v===20){startWin(p,-20);return;}askWin(p,v);return;}
   if(b.dataset.wyes){const v=+document.getElementById("wc"+p).dataset.v;closeAsk();startWin(p,-v);return;}
   if(b.dataset.wno){closeAsk();return;}
+  if(b.dataset.fin){finishRound();return;}
+  if(b.dataset.pcancel){pending=null;renderPending();broadcast();return;}
   if(b.dataset.op){const inp=document.getElementById(`p${p+1}custom`);const n=Math.abs(parseInt(toLatin(inp.value),10));
     if(n){push(p,n*+b.dataset.op,"adj",gid());inp.value="";save();render(p);}else inp.focus();}});
 grid.addEventListener("keydown",e=>{if(e.key!=="Enter"||!e.target.id)return;
