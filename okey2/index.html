@@ -116,6 +116,15 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
 .wn-act .yes{background:var(--plus);color:#fff;border-color:transparent}
 .wn-act .nope{background:transparent;color:var(--ink)}
 body.viewer .wn-act,body.viewer .wn-s{display:none}
+.fbar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:var(--tile);color:var(--ink);border-top:3px solid var(--plus);box-shadow:0 -8px 24px rgba(0,0,0,.22);animation:fup .2s ease-out}
+.fbar-in{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+#fbarText{font-size:15px;text-align:center}
+.fbar .wn-act{margin-top:0}
+body.pending .wrap{padding-bottom:150px}
+@keyframes fup{from{transform:translateY(100%)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.fbar{animation:none}}
 .winner-note{border:2px solid var(--c);text-align:center;font-family:var(--display);font-weight:700;font-size:20px;color:var(--c);background:var(--tile);border-radius:10px;padding:10px}
 body.pending .ctl{display:none}
 .pendbar{margin:0 0 16px;background:var(--tile);color:var(--ink);border:2px solid var(--plus);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:16px;font-weight:600}
@@ -187,6 +196,7 @@ body.viewer .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 10px 22px rgba(0,
 
 
   <div class="roundbig" id="roundBig">الدور الأول</div>
+  <div class="fbar" id="fbar" hidden><div class="fbar-in"><span id="fbarText"></span><div class="wn-act"><button class="yes" type="button" id="fOk">سجّل الدور</button><button class="nope" type="button" id="fCancel">إلغاء</button></div></div></div>
   <div class="pendbar" id="pendBar" hidden><span id="pendText"></span><div class="pend-act"><button class="btn go" id="pendOk" type="button">سجّل الدور</button><button class="btn" id="pendCancel" type="button">إلغاء</button></div></div>
 
   <section class="grid" id="grid"></section>
@@ -291,10 +301,12 @@ function leftVal(i){const n=parseInt(toLatin(document.getElementById(`p${i+1}lef
 function renderPending(){
   document.body.classList.toggle("pending",!!pending);
   const bar=document.getElementById("pendBar");bar.hidden=true;
+  document.getElementById("fbar").hidden=!pending||role==="viewer";
+  if(pending){const tot=[0,1,2,3].filter(i=>i!==pending.w).reduce((s,i)=>s+leftVal(i)*pending.m,0);document.getElementById("fbarText").innerHTML=`<b>${esc(nm(pending.w))}</b> ${WINS[-pending.v].t} · مجموع الباقين <span class="num">+${tot}</span>`;}
   [0,1,2,3].forEach(i=>{const isW=pending&&i===pending.w;
     document.getElementById("pend"+i).hidden=!pending||isW;
     const wn=document.getElementById("wn"+i);wn.hidden=!isW;
-    if(isW)wn.innerHTML=`<div class="wn-t">${WINS[-pending.v].t} <span class="num">${pending.v}</span></div><div class="wn-s">دخّل مجموع أحجار الباقين${pending.m>1?`، وتنضرب ×${pending.m} من نفسها`:""}</div><div class="wn-act"><button class="yes" type="button" data-p="${i}" data-fin="1">سجّل الدور</button><button class="nope" type="button" data-p="${i}" data-pcancel="1">إلغاء</button></div>`;
+    if(isW)wn.innerHTML=`<div class="wn-t">${WINS[-pending.v].t} <span class="num">${pending.v}</span></div><div class="wn-s">دخّل مجموع أحجار الباقين${pending.m>1?`، وتنضرب ×${pending.m} من نفسها`:""}</div>`;
     if(pending&&!isW){const n=leftVal(i);document.getElementById("calc"+i).textContent=pending.m>1?`×${pending.m} = +${n*pending.m}`:`= +${n}`;}});
   if(pending)document.getElementById("pendText").innerHTML=`${esc(nm(pending.w))} ${WINS[-pending.v].t} <bdi dir="ltr">${pending.v}</bdi>. دخّل مجموع أحجار الباقين${pending.m>1?` وتنضرب ×${pending.m} تلقائياً`:""}.`;}
 grid.addEventListener("input",e=>{if(e.target.id&&e.target.id.endsWith("left"))renderPending();});
@@ -303,6 +315,8 @@ function finishRound(){if(!pending)return;const g=gid();
   [0,1,2,3].forEach(i=>{if(i===pending.w)return;const n=leftVal(i);if(n)push(i,n*pending.m,"pts",g,pending.m);});
   state.round++;const w=pending.w;pending=null;renderPending();save();render(w);}
 document.getElementById("pendOk").onclick=finishRound;
+document.getElementById("fOk").onclick=finishRound;
+document.getElementById("fCancel").onclick=()=>{pending=null;renderPending();broadcast();};
 document.getElementById("pendCancel").onclick=()=>{pending=null;renderPending();broadcast();};
 grid.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||role==="viewer")return;const p=+b.dataset.p;
   if(b.dataset.bonus){push(p,-10,"bonus",gid());save();render(p);return;}
