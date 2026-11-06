@@ -88,6 +88,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--c,var(--blue));
 .chip button{border:0;background:transparent;color:inherit;font-size:15px;padding:8px 12px}
 .chip .x{padding:8px 10px;color:var(--muted);border-inline-start:1px solid var(--line)}
 .tile.target{box-shadow:0 5px 0 var(--tile-edge),0 0 0 3px var(--c),0 10px 22px rgba(0,0,0,.28)}
+.wconf{background:var(--tile);border:2px solid var(--c);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;text-align:center}
+.wconf-q{font-size:17px;line-height:1.5}
+.wconf-q small{display:block;font-size:13.5px;color:var(--muted)}
+.wconf-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wconf-act button{border-radius:10px;padding:11px 6px;font-size:16px;font-weight:700;border:1px solid var(--line)}
+.wconf-act .yes{background:var(--c);color:var(--tile);border-color:transparent}
+.wconf-act .nope{background:transparent;color:var(--ink)}
+.tile.asking .win,.tile.asking .bonus,.tile.asking .custom{display:none}
 .ctl{display:flex;flex-direction:column;gap:8px}
 .bonus{border:1.5px dashed color-mix(in srgb,var(--c) 55%,var(--line));background:transparent;color:var(--ink);border-radius:10px;padding:9px;font-size:15px}
 .bonus b{color:var(--minus);direction:ltr;display:inline-block}
@@ -226,6 +234,10 @@ grid.innerHTML=state.names.map((_,i)=>`
   <div class="ctl">
    <button class="bonus" type="button" data-p="${i}" data-bonus="1">بونس بداية الدور <b>−10</b></button>
    <div class="win">${[20,40,80].map(v=>`<button class="w" type="button" data-p="${i}" data-win="${v}"><b>−${v}</b><span>${WINS[v].t}</span><small>${WINS[v].s}</small></button>`).join("")}</div>
+   <div class="wconf" id="wc${i}" hidden>
+    <div class="wconf-q" id="wcq${i}"></div>
+    <div class="wconf-act"><button class="yes" type="button" data-p="${i}" data-wyes="1">نعم، أكّد</button><button class="nope" type="button" data-p="${i}" data-wno="1">لا، رجوع</button></div>
+   </div>
    <div class="custom">
     <button class="op plus" type="button" data-p="${i}" data-op="1" aria-label="إضافة">+</button>
     <input id="p${i+1}custom" type="number" inputmode="numeric" placeholder="تعديل يدوي" aria-label="تعديل يدوي للاعب ${i+1}">
@@ -264,6 +276,10 @@ const gid=()=>Date.now()+Math.random();
 function push(p,v,kind,g,m){state.scores[p]+=v;state.log.push({p,v,kind,g,m:m||1});}
 function startWin(p,v){pending={w:p,v,m:WINS[-v].m};[0,1,2,3].forEach(i=>{const el=document.getElementById(`p${i+1}left`);if(el)el.value="";});renderPending();broadcast();
   const first=[0,1,2,3].find(i=>i!==p);setTimeout(()=>document.getElementById(`p${first+1}left`).focus(),50);}
+function closeAsk(){[0,1,2,3].forEach(i=>{const c=document.getElementById("wc"+i);c.hidden=true;document.getElementById("t"+i).classList.remove("asking");});}
+function askWin(p,v){closeAsk();const c=document.getElementById("wc"+p);c.dataset.v=v;
+  document.getElementById("wcq"+p).innerHTML=`متأكد إن <b>${esc(nm(p))}</b> ${WINS[v].t.replace("فوز","فاز")} <bdi dir="ltr">−${v}</bdi>؟<small>نقاط الباقين بتنضرب ×${WINS[v].m}</small>`;
+  c.hidden=false;document.getElementById("t"+p).classList.add("asking");}
 function leftVal(i){const n=parseInt(toLatin(document.getElementById(`p${i+1}left`).value),10);return Math.max(0,n||0);}
 function renderPending(){
   document.body.classList.toggle("pending",!!pending);
@@ -283,7 +299,9 @@ document.getElementById("pendOk").onclick=finishRound;
 document.getElementById("pendCancel").onclick=()=>{pending=null;renderPending();broadcast();};
 grid.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||role==="viewer")return;const p=+b.dataset.p;
   if(b.dataset.bonus){push(p,-10,"bonus",gid());save();render(p);return;}
-  if(b.dataset.win){startWin(p,-(+b.dataset.win));return;}
+  if(b.dataset.win){const v=+b.dataset.win;if(v===20){startWin(p,-20);return;}askWin(p,v);return;}
+  if(b.dataset.wyes){const v=+document.getElementById("wc"+p).dataset.v;closeAsk();startWin(p,-v);return;}
+  if(b.dataset.wno){closeAsk();return;}
   if(b.dataset.op){const inp=document.getElementById(`p${p+1}custom`);const n=Math.abs(parseInt(toLatin(inp.value),10));
     if(n){push(p,n*+b.dataset.op,"adj",gid());inp.value="";save();render(p);}else inp.focus();}});
 grid.addEventListener("keydown",e=>{if(e.key!=="Enter"||!e.target.id)return;
