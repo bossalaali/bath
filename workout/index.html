@@ -231,6 +231,32 @@ body.rp-open{overflow:hidden}body.rp-open html{scroll-snap-type:none}
 .ov-bad li{background:#3A2230;border-radius:12px;padding:9px 12px;font-size:14px;font-weight:600;line-height:1.6}.ov-bad li::before{content:"✗ ";color:#FF8A94;font-weight:800}
 .ov-p{margin:0;font-size:15px;line-height:1.7;color:#E4E2EE}
 @media print{#exov,#lib{display:none!important}}
+
+.more{display:inline-flex;align-items:center;min-height:36px;margin-inline-start:4px;padding:0 12px;border-radius:18px;border:2px solid #E8414F;background:transparent;color:#fff;font:inherit;font-size:13px;font-weight:800;cursor:pointer;vertical-align:middle}
+.libbtn{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:12px;background:#232131;border:2px solid #3A3850;color:#fff;text-decoration:none;font-weight:800;font-size:15px}
+.libg{margin:10px 0 6px;font-size:17px;font-weight:800;color:#E8414F}
+.libgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.libi{background:#0E0E12;border:2px solid transparent;border-radius:12px;color:#fff;font:inherit;font-weight:800;font-size:14px;padding:6px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-height:44px}
+.libi:focus-visible,.more:focus-visible{outline:3px solid #fff}
+.lfig{width:100%;height:auto;aspect-ratio:4/3}
+#exov{position:fixed;inset:0;z-index:25;background:#2C2A3B;overflow:auto;color:#fff}
+.ov-bar{position:sticky;top:0;display:flex;justify-content:flex-start;padding:10px 12px;background:#2C2A3B;z-index:2;border-bottom:1px solid #3A3850}
+.ov-bar button{min-height:44px;border:none;border-radius:10px;background:#3A3850;color:#fff;font:inherit;font-weight:800;padding:0 18px;cursor:pointer}
+.ov-in{max-width:560px;margin:0 auto;padding:12px 16px 40px;display:flex;flex-direction:column;gap:8px}
+.ov-in>.k{text-align:center;color:#E8414F;font-weight:800;font-size:13px}.ov-in h2{text-align:center}.ov-in .en{text-align:center}
+.ov-figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ov-figs .panel{padding:4px}.ov-figs .fr{height:auto}.ov-figs .fig{width:100%;height:auto}
+.ov-in h3{margin:10px 0 0;font-size:17px;font-weight:800;color:#E8414F}
+.ov-steps{margin:0;padding:0;list-style:none;counter-reset:st;display:flex;flex-direction:column;gap:8px}
+.ov-steps li{counter-increment:st;display:flex;gap:10px;align-items:flex-start;background:#232131;border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.6;font-weight:600}
+.ov-steps li::before{content:counter(st);flex:none;width:28px;height:28px;border-radius:14px;background:#E8414F;display:flex;align-items:center;justify-content:center;font-weight:800}
+.ov-bad{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.ov-bad li{background:#3A2230;border-radius:12px;padding:9px 12px;font-size:14px;font-weight:600;line-height:1.6}.ov-bad li::before{content:"✗ ";color:#FF8A94;font-weight:800}
+.ov-p{margin:0;font-size:15px;line-height:1.7;color:#E4E2EE}
+@media print{#exov,#lib{display:none!important}}
+.ytb{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border-radius:18px;background:#FF0033;color:#fff;font-size:13px;font-weight:800;text-decoration:none;vertical-align:middle}
+.ytbig{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;border-radius:14px;background:#FF0033;color:#fff;font-weight:800;font-size:15px;text-decoration:none;margin-top:6px}
+.yplay{width:30px;height:30px;border-radius:15px;background:#fff;color:#FF0033;display:flex;align-items:center;justify-content:center;font-size:13px}
+.ytb:focus-visible,.ytbig:focus-visible{outline:3px solid #fff}
 </style>
 </head>
 <body>
@@ -258,6 +284,9 @@ body.rp-open{overflow:hidden}body.rp-open html{scroll-snap-type:none}
 </section>
 <div id="plan"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+
+
+
 
 
 <section class="setup lib" id="lib"><h1>مكتبة التمارين</h1><p class="sub">اضغط على أي تمرين وتطلع لك طريقة الأداء خطوة بخطوة، والأخطاء الشائعة، والتنفس.</p><div id="libbody"></div><a class="edit" href="#setup" style="margin-top:8px">الرجوع لصمّم خطتك</a></section><!--/lib-->
@@ -301,6 +330,7 @@ var WK="myplan-weights-v1",LK="myplan-log-v1";
 function getW(){return load(WK)||MEM.w||[];}function setW(v){MEM.w=v;store(WK,v);}
 function getL(){return load(LK)||MEM.l||[];}function setL(v){MEM.l=v;store(LK,v);}
 function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function yt(k){var x=B[k];return "https://www.youtube.com/results?search_query="+encodeURIComponent("شرح تمرين "+x.ar+" "+x.en.toLowerCase());}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function numify(s){return String(s).replace(/(\d+ × \d+(?:–\d+)?|\d[\d,.]*–\d+(?:\.\d+)?)/g,'<span class="num">$1</span>');}
 
@@ -383,7 +413,7 @@ function exHTML(k,sid,dn,n,tot,sets,wtLabel,wtVal,tip,how,nset,rest,isLift,nxt){
  '<div class="wt"><span>'+wtLabel+'</span><strong>'+numify(wtVal)+'</strong></div>'+
  '<div class="chk" data-sid="'+sid+'" data-n="'+nset+'"'+(isLift?' data-lift="1"':'')+'>'+btn+'</div>'+
  '<div class="how" data-rest="'+rest+'" data-txt="'+esc(how)+'">'+numify(how)+'</div>'+
- '<p class="tip">'+numify(tip)+' <button type="button" class="more" data-k="'+k+'">الشرح الكامل</button></p>'+
+ '<p class="tip">'+numify(tip)+' <button type="button" class="more" data-k="'+k+'">الشرح الكامل</button> <a class="ytb" href="'+yt(k)+'" target="_blank" rel="noopener">▶ فيديو</a></p>'+
  '<div class="musc"><div class="mt"><div class="h">العضلات المستهدفة</div><div class="l">'+x.mus+'</div></div><div class="bods"><div>'+x.mf+'<span>أمام</span></div><div>'+x.mb+'<span>خلف</span></div></div></div>'+
  (nxt?'<a class="next" href="#'+nxt[0]+'">التالي: '+esc(nxt[1])+' ←</a>':'')+'</section>';}
 function gridHTML(sid,dn,n,tot,title,lead,tiles,nxt){
@@ -532,6 +562,7 @@ var ov=document.getElementById("exov");
 function openEx(k){var x=B[k],e=EXPL[k]||{s:[],m:[]};
  var h='<div class="ov-bar"><button type="button" id="ov-close">رجوع</button></div><div class="ov-in"><div class="k">شرح التمرين</div><h2>'+esc(x.ar)+'</h2><div class="en" dir="ltr">'+x.en+'</div>'+
  '<div class="ov-figs"><div class="panel"><div class="fr"><span class="tag"><b>1</b>'+x.l1+'</span>'+x.f1+'</div></div><div class="panel"><div class="fr"><span class="tag"><b>2</b>'+x.l2+'</span>'+x.f2+'</div></div></div>'+
+ '<a class="ytbig" href="'+yt(k)+'" target="_blank" rel="noopener"><span class="yplay">▶</span>شوف شرح التمرين بالفيديو على يوتيوب</a>'+
  '<h3>طريقة الأداء</h3><ol class="ov-steps">'+e.s.map(function(t){return '<li>'+numify(t)+'</li>';}).join("")+'</ol>'+
  '<h3>أخطاء شائعة</h3><ul class="ov-bad">'+e.m.map(function(t){return '<li>'+t+'</li>';}).join("")+'</ul>'+
  '<h3>التنفّس</h3><p class="ov-p">'+(BREATH[k]||BREATH.def)+'</p>'+
