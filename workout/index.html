@@ -289,6 +289,9 @@ body.rp-open{overflow:hidden}body.rp-open html{scroll-snap-type:none}
 
 
 
+
+
+
 <section class="setup lib" id="lib"><h1>مكتبة التمارين</h1><p class="sub">اضغط على أي تمرين وتطلع لك طريقة الأداء خطوة بخطوة، والأخطاء الشائعة، والتنفس.</p><div id="libbody"></div><a class="edit" href="#setup" style="margin-top:8px">الرجوع لصمّم خطتك</a></section><!--/lib-->
 <div id="exov" hidden role="dialog" aria-label="شرح التمرين"></div><!--/exov-->
 <div id="report" hidden role="dialog" aria-label="تقرير الخطة"><div class="rp-bar"><button type="button" id="rp-print">حفظ PDF / طباعة</button><button type="button" id="rp-share">مشاركة كنص</button><button type="button" id="rp-csv">تنزيل البيانات (Excel)</button><button type="button" id="rp-close">رجوع</button></div><div id="rp-body"></div></div><!--/report-->
@@ -330,7 +333,8 @@ var WK="myplan-weights-v1",LK="myplan-log-v1";
 function getW(){return load(WK)||MEM.w||[];}function setW(v){MEM.w=v;store(WK,v);}
 function getL(){return load(LK)||MEM.l||[];}function setL(v){MEM.l=v;store(LK,v);}
 function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function yt(k){var x=B[k];return "https://www.youtube.com/results?search_query="+encodeURIComponent("شرح تمرين "+x.ar+" "+x.en.toLowerCase());}
+var VIDS={"Bench": "1WSG7XtR2zI", "ShoulderPress": "9YEpImdGXx8", "ChestFly": "aMnG6Lo8LEo", "Pushdown": "_zgFWq1wvO4", "Curl": "s-I8nxjMu-k", "LateralRaise": "jHHfyKpU_WE", "LatPulldown": "amgXq2ThD0c", "CableRow": "ly-FVDys_bk", "RomanianDeadlift": "vreo-9l6fPw", "LegPress": "W5lbXRsvVSo", "LegExtension": "YQerozgvMgg", "LegCurl": "yXj20GeOauc", "GobletSquat": "Xjo_fY9Hl9w", "Lunges": "ty9aAjPVuN4", "CalfRaise": "ePeEKog98uE", "Treadmill": "RIoVRxf9Wlk", "Plank": "xXS89l_l6kU", "Crunch": "iv2N_H1BPHk"};
+function yt(k){if(VIDS[k])return "https://www.youtube.com/watch?v="+VIDS[k];var x=B[k];return "https://www.youtube.com/results?search_query="+encodeURIComponent("شرح تمرين "+x.ar+" "+x.en.toLowerCase());}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function numify(s){return String(s).replace(/(\d+ × \d+(?:–\d+)?|\d[\d,.]*–\d+(?:\.\d+)?)/g,'<span class="num">$1</span>');}
 
@@ -413,7 +417,7 @@ function exHTML(k,sid,dn,n,tot,sets,wtLabel,wtVal,tip,how,nset,rest,isLift,nxt){
  '<div class="wt"><span>'+wtLabel+'</span><strong>'+numify(wtVal)+'</strong></div>'+
  '<div class="chk" data-sid="'+sid+'" data-n="'+nset+'"'+(isLift?' data-lift="1"':'')+'>'+btn+'</div>'+
  '<div class="how" data-rest="'+rest+'" data-txt="'+esc(how)+'">'+numify(how)+'</div>'+
- '<p class="tip">'+numify(tip)+' <button type="button" class="more" data-k="'+k+'">الشرح الكامل</button> <a class="ytb" href="'+yt(k)+'" target="_blank" rel="noopener">▶ فيديو</a></p>'+
+ '<p class="tip">'+numify(tip)+' <button type="button" class="more" data-k="'+k+'">الشرح الكامل</button> <a class="ytb" href="'+yt(k)+'" target="_blank" rel="noopener">▶ شوف الفيديو</a></p>'+
  '<div class="musc"><div class="mt"><div class="h">العضلات المستهدفة</div><div class="l">'+x.mus+'</div></div><div class="bods"><div>'+x.mf+'<span>أمام</span></div><div>'+x.mb+'<span>خلف</span></div></div></div>'+
  (nxt?'<a class="next" href="#'+nxt[0]+'">التالي: '+esc(nxt[1])+' ←</a>':'')+'</section>';}
 function gridHTML(sid,dn,n,tot,title,lead,tiles,nxt){
