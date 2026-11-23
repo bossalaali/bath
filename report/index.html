@@ -48,23 +48,27 @@ nav div{display:flex;max-width:480px;width:100%}
 nav button{flex:1;font:inherit;border:0;background:none;color:var(--muted);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:21px;filter:grayscale(1);opacity:.6}
 nav button.on{color:var(--rose)} nav button.on span{filter:none;opacity:1}
+#ptr{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;z-index:9;pointer-events:none}
+#ptr .sp{width:26px;height:26px;margin-bottom:10px;border:3px solid var(--rose2);border-top-color:var(--rose);border-radius:50%}
+#ptr.go .sp{animation:r .7s linear infinite}@keyframes r{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
+<div id="ptr"><div class="sp"></div></div>
 <div class="wrap">
 <header>
   <div class="brand">Elegant &amp; Pretty</div>
   <h1 id="ttl">نظرة عامة</h1>
-  <div class="sub">إحصائيات إنستقرام · آخر 30 يوماً · حتى 24 نوفمبر 2026</div>
+  <div class="sub" id="upd">إحصائيات إنستقرام</div>
 </header>
 
 <section class="view on" id="v-home">
   <div class="kpis">
-    <div class="kpi"><div class="l">الأعلى مشاهدة</div><div class="v">297</div><div class="n">عطر Destinée</div></div>
-    <div class="kpi"><div class="l">الأعلى زيارات</div><div class="v">12</div><div class="n">كريم Bali Curls</div></div>
-    <div class="kpi"><div class="l">الأعلى مشاركة</div><div class="v">11</div><div class="n">غارنييه والشوكولاتة</div></div>
+    <div class="kpi"><div class="l">الأعلى مشاهدة</div><div class="v" id="k1v">–</div><div class="n" id="k1n"></div></div>
+    <div class="kpi"><div class="l">الأعلى زيارات</div><div class="v" id="k2v">–</div><div class="n" id="k2n"></div></div>
+    <div class="kpi"><div class="l">الأعلى مشاركة</div><div class="v" id="k3v">–</div><div class="n" id="k3n"></div></div>
   </div>
-  <div class="card"><p class="note" style="font-size:15px;color:var(--ink)">تحقق <b>العطور وبوكسات الهدايا</b> أعلى المشاهدات، بينما <b>منتجات العناية بالشعر</b> هي الأكثر تحويلاً للعملاء نحو الحساب ورابط الطلب.</p></div>
+  <div class="card"><p class="note" id="sum" style="font-size:15px;color:var(--ink)">جارٍ التحميل…</p></div>
   <div class="sec">الأكثر وصولاً للطلب</div>
   <div class="card" id="top"></div>
 </section>
@@ -89,7 +93,7 @@ nav button.on{color:var(--rose)} nav button.on span{filter:none;opacity:1}
   <div class="card"><p class="note">
   • المصدر: إحصائيات حساب الإنستقرام لآخر 30 يوماً، مجموعة لكل منتج (المنشور والريلز).<br>
   • الريلز المشتركة بين أكثر من منتج غير محسوبة لمنتج واحد.<br>
-  • مزيلات Glamorous Moment وGolden Moon غير مشمولة لحداثة نشرها.<br>
+  • تتحدث البيانات تلقائياً كل يوم، واسحبي الصفحة للأسفل لجلب آخر تحديث.<br>
   • رسائل الدايركت غير مشمولة حالياً، وستُضاف في تحديث لاحق.</p></div>
 </section>
 </div>
@@ -102,22 +106,32 @@ nav button.on{color:var(--rose)} nav button.on span{filter:none;opacity:1}
 </div></nav>
 
 <script>
-var P=[
-["عطر Destinée",7,297,1,"p"],["عطر Charisme",6,277,1,"p"],["مناديل الوجه",1.2,233,0,"s"],["باليا أكوا",3.5,233,0,"s"],
-["بوكس Miss Dream",10,222,2,"b"],["بوكس Extreme Story",10,222,0,"b"],["طقم واكاتي",7,204,0,"c"],["رغوة Bali Curls",6,187,3,"c"],
-["واقي الحرارة باليا",2.5,180,8,"c"],["مزيل فانيلا وجوز هند",2.5,166,0,"s"],["بوكس Her Choice",10,131,0,"b"],["زيت باليا",2.5,130,0,"c"],
-["شوكولاتة ساخنة",3.5,128,0,"s"],["كريم Bali Curls",6,121,12,"c"],["ميسيلار غارنييه",4,116,0,"s"],["إينيكتو",6,63,0,"c"],
-["كريم-جل Curl Co.",4,60,1,"c"],["بديل السكر",null,56,2,"s"],["بخاخ Curl Co.",3.5,53,1,"c"]];
-var TG={c:["شعر","c"],p:["عطر","p"],s:["عناية","s"],b:["هدية","b"]};
-function rows(k,n){var i=k=="v"?2:3;var a=P.slice().sort(function(x,y){return y[i]-x[i]}).filter(function(x){return k=="v"||x[3]>0});if(n)a=a.slice(0,n);var m=a[0][i];
-return a.map(function(p,r){var t=TG[p[4]];return '<div class="row"><div class="rk'+(r<3?' t':'')+'">'+(r+1)+'</div><div class="mid"><div class="nm">'+p[0]+'<span class="tag '+t[1]+'">'+t[0]+'</span></div><div class="meta">'+(p[1]!=null?p[1]+' د.ب':'—')+'</div><div class="bar"><i style="width:'+Math.max(4,p[i]/m*100)+'%"></i></div></div><div class="val">'+p[i]+'</div></div>'}).join('')}
-document.getElementById('top').innerHTML=rows('z',3);
-var L=document.getElementById('list');L.innerHTML=rows('v');
-document.querySelector('.seg').onclick=function(e){var b=e.target.closest('button');if(!b)return;this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x==b)});L.innerHTML=rows(b.dataset.k)};
+var P=[],TG={c:["شعر","c"],p:["عطر","p"],s:["عناية","s"],b:["هدية","b"]},CAT={c:"منتجات العناية بالشعر",p:"العطور",s:"منتجات البشرة والجسم",b:"بوكسات الهدايا"};
+var mode="v",KEY={v:"views",z:"visits"};
+function $(i){return document.getElementById(i)}
+function best(f){return P.slice().sort(function(a,b){return b[f]-a[f]})[0]}
+function rows(k,n){var f=KEY[k];var a=P.slice().sort(function(x,y){return y[f]-x[f]}).filter(function(x){return k=="v"||x[f]>0});if(n)a=a.slice(0,n);if(!a.length)return '<p class="note">لا توجد بيانات بعد.</p>';var m=a[0][f]||1;
+return a.map(function(p,r){var t=TG[p.cat]||TG.s;return '<div class="row"><div class="rk'+(r<3?' t':'')+'">'+(r+1)+'</div><div class="mid"><div class="nm">'+p.name+'<span class="tag '+t[1]+'">'+t[0]+'</span></div><div class="meta">'+(p.price!=null?p.price+' د.ب':'—')+'</div><div class="bar"><i style="width:'+Math.max(4,p[f]/m*100)+'%"></i></div></div><div class="val">'+p[f]+'</div></div>'}).join('')}
+function catTop(f){var s={};P.forEach(function(p){s[p.cat]=(s[p.cat]||0)+p[f]});return Object.keys(s).sort(function(a,b){return s[b]-s[a]})[0]}
+function render(d){P=d.products||[];if(!P.length)return;
+var a=best("views"),b=best("visits"),c=best("shares");
+$("k1v").textContent=a.views;$("k1n").textContent=a.name;$("k2v").textContent=b.visits;$("k2n").textContent=b.name;$("k3v").textContent=c.shares;$("k3n").textContent=c.name;
+var cv=catTop("views"),cz=catTop("visits");
+$("sum").innerHTML=cv==cz?'تتصدر <b>'+CAT[cv]+'</b> المشاهدات وزيارات الحساب معاً.':'تحقق <b>'+CAT[cv]+'</b> أعلى المشاهدات، بينما <b>'+CAT[cz]+'</b> هي الأكثر تحويلاً للعملاء نحو الحساب ورابط الطلب.';
+var t=new Date(d.updated);$("upd").textContent="إحصائيات إنستقرام · آخر تحديث "+t.toLocaleDateString("ar-BH",{day:"numeric",month:"long"})+" "+t.toLocaleTimeString("ar-BH",{hour:"numeric",minute:"2-digit"});
+$("top").innerHTML=rows("z",3);$("list").innerHTML=rows(mode)}
+function load(){return fetch("data.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(render).catch(function(){$("sum").textContent="تعذر تحميل البيانات، اسحبي للأسفل للمحاولة مرة ثانية."})}
+load();
+document.querySelector('.seg').onclick=function(e){var b=e.target.closest('button');if(!b)return;this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x==b)});mode=b.dataset.k;$("list").innerHTML=rows(mode)};
 document.querySelector('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;
 this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x==b)});
 document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('on',v.id=='v-'+b.dataset.v)});
-document.getElementById('ttl').textContent=b.dataset.t;scrollTo(0,0)};
+$('ttl').textContent=b.dataset.t;scrollTo(0,0)};
+// pull to refresh
+var y0=null,dy=0,ptr=$("ptr"),sp=ptr.firstChild;
+addEventListener("touchstart",function(e){y0=scrollY<=0?e.touches[0].clientY:null;dy=0},{passive:true});
+addEventListener("touchmove",function(e){if(y0==null)return;dy=Math.max(0,Math.min(110,e.touches[0].clientY-y0));ptr.style.height=dy*0.7+"px";sp.style.transform="rotate("+dy*3+"deg)"},{passive:true});
+addEventListener("touchend",function(){if(y0==null)return;y0=null;if(dy>70){ptr.classList.add("go");ptr.style.height="56px";load().then(function(){setTimeout(function(){ptr.classList.remove("go");ptr.style.height="0"},400)})}else ptr.style.height="0"});
 </script>
 </body>
 </html>

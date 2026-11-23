@@ -1,0 +1,480 @@
+{
+ "products": {
+  "heat": {
+   "name": "واقي الحرارة باليا",
+   "cat": "c",
+   "price": 2.5,
+   "kw": [
+    "الواقي من الحرارة",
+    "واقي الحرارة",
+    "الاستشوار أو الستريتنر"
+   ]
+  },
+  "foam": {
+   "name": "رغوة Bali Curls",
+   "cat": "c",
+   "price": 6,
+   "kw": [
+    "رغوة تكثيف",
+    "CURL VOLUME FOAM",
+    "رغوة Bali Curls"
+   ]
+  },
+  "cream": {
+   "name": "كريم Bali Curls",
+   "cat": "c",
+   "price": 6,
+   "kw": [
+    "كريم بالي كيرلز",
+    "Bali Curls Hydrating"
+   ]
+  },
+  "oil": {
+   "name": "زيت باليا",
+   "cat": "c",
+   "price": 2.5,
+   "kw": [
+    "زيت باليا"
+   ]
+  },
+  "aqua": {
+   "name": "باليا أكوا",
+   "cat": "s",
+   "price": 3.5,
+   "kw": [
+    "باليا أكوا"
+   ]
+  },
+  "charisme": {
+   "name": "عطر Charisme",
+   "cat": "p",
+   "price": 6,
+   "kw": [
+    "Charisme"
+   ]
+  },
+  "wipes": {
+   "name": "مناديل الوجه",
+   "cat": "s",
+   "price": 1.2,
+   "kw": [
+    "مناديل مبللة"
+   ]
+  },
+  "curlgel": {
+   "name": "كريم-جل Curl Co.",
+   "cat": "c",
+   "price": 4,
+   "kw": [
+    "شيب آند ديفاين",
+    "Shape & Define"
+   ]
+  },
+  "curlspray": {
+   "name": "بخاخ Curl Co.",
+   "cat": "c",
+   "price": 3.5,
+   "kw": [
+    "بخاخ تصفيف الشعر المُعزز"
+   ]
+  },
+  "wakati": {
+   "name": "طقم واكاتي",
+   "cat": "c",
+   "price": 7,
+   "kw": [
+    "واكاتي"
+   ]
+  },
+  "choc": {
+   "name": "شوكولاتة ساخنة",
+   "cat": "s",
+   "price": 3.5,
+   "kw": [
+    "الشوكولاتة الساخنة"
+   ]
+  },
+  "inecto": {
+   "name": "إينيكتو",
+   "cat": "c",
+   "price": 6,
+   "kw": [
+    "إينيكتو",
+    "Inecto"
+   ]
+  },
+  "garnier": {
+   "name": "ميسيلار غارنييه",
+   "cat": "s",
+   "price": 4,
+   "kw": [
+    "غارنييه",
+    "Garnier"
+   ]
+  },
+  "destinee": {
+   "name": "عطر Destinée",
+   "cat": "p",
+   "price": 7,
+   "kw": [
+    "Destinée",
+    "Destinee"
+   ]
+  },
+  "herchoice": {
+   "name": "بوكس Her Choice",
+   "cat": "b",
+   "price": 10,
+   "kw": [
+    "Her Choice"
+   ]
+  },
+  "missdream": {
+   "name": "بوكس Miss Dream",
+   "cat": "b",
+   "price": 10,
+   "kw": [
+    "Miss Dream"
+   ]
+  },
+  "sugar": {
+   "name": "بديل السكر",
+   "cat": "s",
+   "price": null,
+   "kw": [
+    "بديل السكر"
+   ]
+  },
+  "goldenmoon": {
+   "name": "مزيل Golden Moon",
+   "cat": "s",
+   "price": 2.5,
+   "kw": [
+    "Golden Moon"
+   ]
+  },
+  "glamorous": {
+   "name": "مزيل Glamorous Moment",
+   "cat": "s",
+   "price": 2.5,
+   "kw": [
+    "Glamorous Moment"
+   ]
+  },
+  "vanilla": {
+   "name": "مزيل فانيلا وجوز هند",
+   "cat": "s",
+   "price": 2.5,
+   "kw": [
+    "الفانيليا وجوز الهند",
+    "Vanille & Kokos"
+   ]
+  },
+  "extreme": {
+   "name": "بوكس Extreme Story",
+   "cat": "b",
+   "price": 10,
+   "kw": [
+    "Extreme Story"
+   ]
+  }
+ },
+ "posts": {
+  "DfFhEPijM1m": {
+   "key": "heat",
+   "views": 127,
+   "reach": 47,
+   "visits": 8,
+   "shares": 1,
+   "saves": 0
+  },
+  "DfJ2kamtjOT": {
+   "key": "heat",
+   "views": 53,
+   "reach": 39,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfJ9b4tjcbp": {
+   "key": "foam",
+   "views": 128,
+   "reach": 47,
+   "visits": 3,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfJ9oLVtK5C": {
+   "key": "foam",
+   "views": 59,
+   "reach": 46,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfJ4IiXDRjj": {
+   "key": "cream",
+   "views": 121,
+   "reach": 74,
+   "visits": 12,
+   "shares": 2,
+   "saves": 0
+  },
+  "DfJ8xnqN81_": {
+   "key": "_skip",
+   "views": 32,
+   "reach": 30,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfJ24lJDSvU": {
+   "key": "oil",
+   "views": 64,
+   "reach": 31,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfJ3RkmN7Gb": {
+   "key": "oil",
+   "views": 66,
+   "reach": 53,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfSgAnzjYcn": {
+   "key": "aqua",
+   "views": 168,
+   "reach": 41,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfSgWIOt28K": {
+   "key": "aqua",
+   "views": 65,
+   "reach": 47,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfXvsYHjWxX": {
+   "key": "charisme",
+   "views": 177,
+   "reach": 46,
+   "visits": 1,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfXw1EuNrdU": {
+   "key": "charisme",
+   "views": 100,
+   "reach": 76,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuKSXtDfTZ": {
+   "key": "wipes",
+   "views": 153,
+   "reach": 38,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuUDVptEaB": {
+   "key": "wipes",
+   "views": 80,
+   "reach": 43,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuJW4iNCQ6": {
+   "key": "_skip",
+   "views": 89,
+   "reach": 76,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuI7XejUWP": {
+   "key": "curlgel",
+   "views": 60,
+   "reach": 34,
+   "visits": 1,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuDhpwDQxP": {
+   "key": "curlspray",
+   "views": 53,
+   "reach": 32,
+   "visits": 1,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuB7j7jfDk": {
+   "key": "wakati",
+   "views": 150,
+   "reach": 46,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfuCyrnN5cX": {
+   "key": "wakati",
+   "views": 54,
+   "reach": 36,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "Dft9jepNKWq": {
+   "key": "choc",
+   "views": 128,
+   "reach": 56,
+   "visits": 0,
+   "shares": 11,
+   "saves": 0
+  },
+  "DfzMw2QNil5": {
+   "key": "inecto",
+   "views": 63,
+   "reach": 29,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfzLxMJDX6n": {
+   "key": "garnier",
+   "views": 76,
+   "reach": 23,
+   "visits": 0,
+   "shares": 11,
+   "saves": 0
+  },
+  "DfzMKrXtZFp": {
+   "key": "garnier",
+   "views": 40,
+   "reach": 29,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "Df2UxcPjbBH": {
+   "key": "destinee",
+   "views": 229,
+   "reach": 57,
+   "visits": 1,
+   "shares": 0,
+   "saves": 0
+  },
+  "Df2U9sWND8m": {
+   "key": "destinee",
+   "views": 68,
+   "reach": 48,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "Df2RadFNS1y": {
+   "key": "herchoice",
+   "views": 102,
+   "reach": 54,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "Df2S8BMNTV-": {
+   "key": "herchoice",
+   "views": 29,
+   "reach": 21,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "Df1sPhhjSbj": {
+   "key": "missdream",
+   "views": 170,
+   "reach": 57,
+   "visits": 2,
+   "shares": 1,
+   "saves": 0
+  },
+  "Df2C36Ztjfn": {
+   "key": "missdream",
+   "views": 52,
+   "reach": 33,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DfFHRTwNLtl": {
+   "key": "sugar",
+   "views": 56,
+   "reach": 30,
+   "visits": 2,
+   "shares": 0,
+   "saves": 0
+  },
+  "DgDctTvtaQ2": {
+   "key": "goldenmoon",
+   "views": 33,
+   "reach": 16,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DgDdW0tN2rB": {
+   "key": "goldenmoon",
+   "views": 23,
+   "reach": 19,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DgC0fqHt8vO": {
+   "key": "glamorous",
+   "views": 43,
+   "reach": 18,
+   "visits": 1,
+   "shares": 0,
+   "saves": 0
+  },
+  "DgCyF28jQrq": {
+   "key": "vanilla",
+   "views": 118,
+   "reach": 34,
+   "visits": 0,
+   "shares": 0,
+   "saves": 0
+  },
+  "DgCyfJVtyri": {
+   "key": "vanilla",
+   "views": 48,
+   "reach": 32,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  },
+  "DgCofJZN2qs": {
+   "key": "extreme",
+   "views": 70,
+   "reach": 43,
+   "visits": 0,
+   "shares": 0,
+   "saves": 1
+  },
+  "DgCpIegtfV2": {
+   "key": "extreme",
+   "views": 152,
+   "reach": 74,
+   "visits": null,
+   "shares": 0,
+   "saves": 0
+  }
+ }
+}
