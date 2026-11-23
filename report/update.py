@@ -59,10 +59,18 @@ def main(path):
         if p['key'] == '_skip' or p['key'] not in products: continue
         a = agg.setdefault(p['key'], dict(views=0, reach=0, visits=0, shares=0, saves=0))
         for f in a: a[f] += int(p.get(f) or 0)
+    # link each product to its main post: the feed post (reels have no visits) with most views
+    link = {}
+    for sc, p in posts.items():
+        k = p['key']
+        score = (p.get('visits') is not None, p.get('views') or 0)
+        if k in agg and (k not in link or score > link[k][0]):
+            link[k] = (score, sc)
     out = []
     for k, a in agg.items():
         pr = products[k]
-        out.append(dict(name=pr['name'], cat=pr['cat'], price=pr['price'], **a))
+        out.append(dict(name=pr['name'], cat=pr['cat'], price=pr['price'],
+                        url='https://www.instagram.com/p/%s/' % link[k][1], **a))
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=3)))
     json.dump(store, open(os.path.join(HERE, 'store.json'), 'w'), ensure_ascii=False, indent=1)
     json.dump({'updated': now.strftime('%Y-%m-%dT%H:%M'), 'products': out},

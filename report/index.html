@@ -16,6 +16,10 @@ h1{font-size:26px;font-weight:800;margin-top:2px}
 .sub{color:var(--muted);font-size:14px;margin-top:2px}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 18px}
 .kpi{background:var(--card);border-radius:18px;padding:12px 10px;box-shadow:0 4px 18px -12px rgba(90,50,45,.35)}
+a.kpi{text-decoration:none;color:inherit;display:block}
+.kpi .go{font-size:11px;color:var(--rose);font-weight:700;margin-top:6px}
+a.row{text-decoration:none;color:inherit}
+.chev{color:#c9b5b1;font-size:18px;flex:none}
 .kpi .l{font-size:12px;color:var(--muted)}
 .kpi .v{font-size:24px;font-weight:800;color:var(--rose);margin-top:2px}
 .kpi .n{font-size:12px;margin-top:2px;line-height:1.35}
@@ -64,9 +68,9 @@ nav button.on{color:var(--rose)} nav button.on span{filter:none;opacity:1}
 
 <section class="view on" id="v-home">
   <div class="kpis">
-    <div class="kpi"><div class="l">الأعلى مشاهدة</div><div class="v" id="k1v">–</div><div class="n" id="k1n"></div></div>
-    <div class="kpi"><div class="l">الأعلى زيارات</div><div class="v" id="k2v">–</div><div class="n" id="k2n"></div></div>
-    <div class="kpi"><div class="l">الأعلى مشاركة</div><div class="v" id="k3v">–</div><div class="n" id="k3n"></div></div>
+    <a class="kpi" id="k1a" target="_blank" rel="noopener"><div class="l">الأعلى مشاهدة</div><div class="v" id="k1v">–</div><div class="n" id="k1n"></div><div class="go">عرض المنتج ‹</div></a>
+    <a class="kpi" id="k2a" target="_blank" rel="noopener"><div class="l">الأعلى زيارات</div><div class="v" id="k2v">–</div><div class="n" id="k2n"></div><div class="go">عرض المنتج ‹</div></a>
+    <a class="kpi" id="k3a" target="_blank" rel="noopener"><div class="l">الأعلى مشاركة</div><div class="v" id="k3v">–</div><div class="n" id="k3n"></div><div class="go">عرض المنتج ‹</div></a>
   </div>
   <div class="card"><p class="note" id="sum" style="font-size:15px;color:var(--ink)">جارٍ التحميل…</p></div>
   <div class="sec">الأكثر وصولاً للطلب</div>
@@ -111,11 +115,11 @@ var mode="v",KEY={v:"views",z:"visits"};
 function $(i){return document.getElementById(i)}
 function best(f){return P.slice().sort(function(a,b){return b[f]-a[f]})[0]}
 function rows(k,n){var f=KEY[k];var a=P.slice().sort(function(x,y){return y[f]-x[f]}).filter(function(x){return k=="v"||x[f]>0});if(n)a=a.slice(0,n);if(!a.length)return '<p class="note">لا توجد بيانات بعد.</p>';var m=a[0][f]||1;
-return a.map(function(p,r){var t=TG[p.cat]||TG.s;return '<div class="row"><div class="rk'+(r<3?' t':'')+'">'+(r+1)+'</div><div class="mid"><div class="nm">'+p.name+'<span class="tag '+t[1]+'">'+t[0]+'</span></div><div class="meta">'+(p.price!=null?p.price+' د.ب':'—')+'</div><div class="bar"><i style="width:'+Math.max(4,p[f]/m*100)+'%"></i></div></div><div class="val">'+p[f]+'</div></div>'}).join('')}
+return a.map(function(p,r){var t=TG[p.cat]||TG.s;return '<a class="row" href="'+(p.url||'#')+'" target="_blank" rel="noopener"><div class="rk'+(r<3?' t':'')+'">'+(r+1)+'</div><div class="mid"><div class="nm">'+p.name+'<span class="tag '+t[1]+'">'+t[0]+'</span></div><div class="meta">'+(p.price!=null?p.price+' د.ب':'—')+'</div><div class="bar"><i style="width:'+Math.max(4,p[f]/m*100)+'%"></i></div></div><div class="val">'+p[f]+'</div><span class="chev">‹</span></a>'}).join('')}
 function catTop(f){var s={};P.forEach(function(p){s[p.cat]=(s[p.cat]||0)+p[f]});return Object.keys(s).sort(function(a,b){return s[b]-s[a]})[0]}
 function render(d){P=d.products||[];if(!P.length)return;
 var a=best("views"),b=best("visits"),c=best("shares");
-$("k1v").textContent=a.views;$("k1n").textContent=a.name;$("k2v").textContent=b.visits;$("k2n").textContent=b.name;$("k3v").textContent=c.shares;$("k3n").textContent=c.name;
+$("k1a").href=a.url;$("k2a").href=b.url;$("k3a").href=c.url;$("k1v").textContent=a.views;$("k1n").textContent=a.name;$("k2v").textContent=b.visits;$("k2n").textContent=b.name;$("k3v").textContent=c.shares;$("k3n").textContent=c.name;
 var cv=catTop("views"),cz=catTop("visits");
 $("sum").innerHTML=cv==cz?'تتصدر <b>'+CAT[cv]+'</b> المشاهدات وزيارات الحساب معاً.':'تحقق <b>'+CAT[cv]+'</b> أعلى المشاهدات، بينما <b>'+CAT[cz]+'</b> هي الأكثر تحويلاً للعملاء نحو الحساب ورابط الطلب.';
 var t=new Date(d.updated);$("upd").textContent="إحصائيات إنستقرام · آخر تحديث "+t.toLocaleDateString("ar-BH",{day:"numeric",month:"long"})+" "+t.toLocaleTimeString("ar-BH",{hour:"numeric",minute:"2-digit"});
