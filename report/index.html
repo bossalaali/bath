@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>تقرير اهتمام العملاء | Elegant & Pretty</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f2ef;--card:#fff;--ink:#2f2326;--muted:#8d7a7e;--rose:#b56f64;--rose2:#e8c3bb;--gold:#b8955a;--green:#3f9a6b;--line:#efe4df}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:Tajawal,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:env(safe-area-inset-top) 0 calc(84px + env(safe-area-inset-bottom))}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px}
+header{padding:22px 4px 14px}
+.brand{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:22px;color:var(--rose)}
+h1{font-size:26px;font-weight:800;margin-top:2px}
+.sub{color:var(--muted);font-size:14px;margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 18px}
+.kpi{background:var(--card);border-radius:18px;padding:12px 10px;box-shadow:0 4px 18px -12px rgba(90,50,45,.35)}
+.kpi .l{font-size:12px;color:var(--muted)}
+.kpi .v{font-size:24px;font-weight:800;color:var(--rose);margin-top:2px}
+.kpi .n{font-size:12px;margin-top:2px;line-height:1.35}
+.sec{font-size:17px;font-weight:800;margin:20px 4px 10px}
+.card{background:var(--card);border-radius:20px;padding:6px 14px;box-shadow:0 4px 18px -12px rgba(90,50,45,.35)}
+.seg{display:flex;background:#ebe1dd;border-radius:12px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;font:inherit;font-size:14px;font-weight:700;border:0;background:none;padding:8px;border-radius:10px;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.rk{width:24px;height:24px;border-radius:50%;background:var(--bg);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;color:var(--muted)}
+.rk.t{background:var(--rose);color:#fff}
+.mid{flex:1;min-width:0}
+.nm{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{font-size:12px;color:var(--muted)}
+.bar{height:6px;background:var(--bg);border-radius:6px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--rose2),var(--rose))}
+.val{font-size:17px;font-weight:800;min-width:36px;text-align:left}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;margin-inline-start:4px;vertical-align:middle}
+.tag.c{background:#fdeee9;color:var(--rose)} .tag.p{background:#f3ebdd;color:var(--gold)} .tag.s{background:#e6f1f2;color:#4b8790} .tag.b{background:#eee9f6;color:#7a62a8}
+.rec{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:0}
+.ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+.rec b{font-size:15px;display:block}
+.rec p{font-size:14px;color:#5b4a4e;line-height:1.6}
+.note{font-size:13px;color:var(--muted);line-height:1.7;padding:12px 0}
+.view{display:none}.view.on{display:block}
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+nav div{display:flex;max-width:480px;width:100%}
+nav button{flex:1;font:inherit;border:0;background:none;color:var(--muted);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:21px;filter:grayscale(1);opacity:.6}
+nav button.on{color:var(--rose)} nav button.on span{filter:none;opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">Elegant &amp; Pretty</div>
+  <h1 id="ttl">نظرة عامة</h1>
+  <div class="sub">إحصائيات إنستقرام · آخر 30 يوماً · حتى 24 نوفمبر 2026</div>
+</header>
+
+<section class="view on" id="v-home">
+  <div class="kpis">
+    <div class="kpi"><div class="l">الأعلى مشاهدة</div><div class="v">297</div><div class="n">عطر Destinée</div></div>
+    <div class="kpi"><div class="l">الأعلى زيارات</div><div class="v">12</div><div class="n">كريم Bali Curls</div></div>
+    <div class="kpi"><div class="l">الأعلى مشاركة</div><div class="v">11</div><div class="n">غارنييه والشوكولاتة</div></div>
+  </div>
+  <div class="card"><p class="note" style="font-size:15px;color:var(--ink)">تحقق <b>العطور وبوكسات الهدايا</b> أعلى المشاهدات، بينما <b>منتجات العناية بالشعر</b> هي الأكثر تحويلاً للعملاء نحو الحساب ورابط الطلب.</p></div>
+  <div class="sec">الأكثر وصولاً للطلب</div>
+  <div class="card" id="top"></div>
+</section>
+
+<section class="view" id="v-rank">
+  <div class="seg"><button class="on" data-k="v">المشاهدات</button><button data-k="z">زيارات الحساب</button></div>
+  <div class="card" id="list"></div>
+  <p class="note">الزيارات: عدد من زار الحساب بعد مشاهدة المنشور، وهي متاحة للمنشورات دون الريلز. الأسعار بالدينار البحريني.</p>
+</section>
+
+<section class="view" id="v-rec">
+  <div class="card">
+    <div class="rec"><div class="ic" style="background:#fdeee9">📦</div><div><b>المخزون</b><p>زيادة الكمية من كريم Bali Curls والواقي من الحرارة في الطلبية القادمة.</p></div></div>
+    <div class="rec"><div class="ic" style="background:#f3ebdd">🌸</div><div><b>العطور والبوكسات</b><p>ذكر العطر المعروف المشابه في أول ثانيتين من الريلز، والترويج للبوكسات قبل المناسبات.</p></div></div>
+    <div class="rec"><div class="ic" style="background:#e6f1f2">🎁</div><div><b>المسابقات</b><p>اعتماد ميسيلار غارنييه جائزةً، لأنه الأكثر مشاركة بين العملاء.</p></div></div>
+    <div class="rec"><div class="ic" style="background:#eee9f6">🎬</div><div><b>المنتجات الأضعف</b><p>نشر ريل «قبل وبعد» لمنتجات The Curl Company وإينيكتو قبل إعادة طلبها.</p></div></div>
+    <div class="rec"><div class="ic" style="background:#fbf3e3">🔖</div><div><b>الحفظ</b><p>إضافة دعوة لحفظ المنشور في نهاية كل كابشن، فالحفظ شبه معدوم حالياً.</p></div></div>
+  </div>
+</section>
+
+<section class="view" id="v-info">
+  <div class="card"><p class="note">
+  • المصدر: إحصائيات حساب الإنستقرام لآخر 30 يوماً، مجموعة لكل منتج (المنشور والريلز).<br>
+  • الريلز المشتركة بين أكثر من منتج غير محسوبة لمنتج واحد.<br>
+  • مزيلات Glamorous Moment وGolden Moon غير مشمولة لحداثة نشرها.<br>
+  • رسائل الدايركت غير مشمولة حالياً، وستُضاف في تحديث لاحق.</p></div>
+</section>
+</div>
+
+<nav><div>
+  <button class="on" data-v="home" data-t="نظرة عامة"><span>🏠</span>الرئيسية</button>
+  <button data-v="rank" data-t="ترتيب المنتجات"><span>📊</span>الترتيب</button>
+  <button data-v="rec" data-t="التوصيات"><span>💡</span>التوصيات</button>
+  <button data-v="info" data-t="عن التقرير"><span>ℹ️</span>المنهجية</button>
+</div></nav>
+
+<script>
+var P=[
+["عطر Destinée",7,297,1,"p"],["عطر Charisme",6,277,1,"p"],["مناديل الوجه",1.2,233,0,"s"],["باليا أكوا",3.5,233,0,"s"],
+["بوكس Miss Dream",10,222,2,"b"],["بوكس Extreme Story",10,222,0,"b"],["طقم واكاتي",7,204,0,"c"],["رغوة Bali Curls",6,187,3,"c"],
+["واقي الحرارة باليا",2.5,180,8,"c"],["مزيل فانيلا وجوز هند",2.5,166,0,"s"],["بوكس Her Choice",10,131,0,"b"],["زيت باليا",2.5,130,0,"c"],
+["شوكولاتة ساخنة",3.5,128,0,"s"],["كريم Bali Curls",6,121,12,"c"],["ميسيلار غارنييه",4,116,0,"s"],["إينيكتو",6,63,0,"c"],
+["كريم-جل Curl Co.",4,60,1,"c"],["بديل السكر",null,56,2,"s"],["بخاخ Curl Co.",3.5,53,1,"c"]];
+var TG={c:["شعر","c"],p:["عطر","p"],s:["عناية","s"],b:["هدية","b"]};
+function rows(k,n){var i=k=="v"?2:3;var a=P.slice().sort(function(x,y){return y[i]-x[i]}).filter(function(x){return k=="v"||x[3]>0});if(n)a=a.slice(0,n);var m=a[0][i];
+return a.map(function(p,r){var t=TG[p[4]];return '<div class="row"><div class="rk'+(r<3?' t':'')+'">'+(r+1)+'</div><div class="mid"><div class="nm">'+p[0]+'<span class="tag '+t[1]+'">'+t[0]+'</span></div><div class="meta">'+(p[1]!=null?p[1]+' د.ب':'—')+'</div><div class="bar"><i style="width:'+Math.max(4,p[i]/m*100)+'%"></i></div></div><div class="val">'+p[i]+'</div></div>'}).join('')}
+document.getElementById('top').innerHTML=rows('z',3);
+var L=document.getElementById('list');L.innerHTML=rows('v');
+document.querySelector('.seg').onclick=function(e){var b=e.target.closest('button');if(!b)return;this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x==b)});L.innerHTML=rows(b.dataset.k)};
+document.querySelector('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;
+this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x==b)});
+document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('on',v.id=='v-'+b.dataset.v)});
+document.getElementById('ttl').textContent=b.dataset.t;scrollTo(0,0)};
+</script>
+</body>
+</html>
