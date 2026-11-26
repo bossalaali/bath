@@ -366,7 +366,7 @@
   },
   "Df2UxcPjbBH": {
    "key": "destinee",
-   "views": 231,
+   "views": 233,
    "reach": 58,
    "visits": 2,
    "shares": 0,
@@ -398,16 +398,16 @@
   },
   "Df1sPhhjSbj": {
    "key": "missdream",
-   "views": 182,
-   "reach": 59,
+   "views": 191,
+   "reach": 64,
    "visits": 2,
    "shares": 1,
    "saves": 0
   },
   "Df2C36Ztjfn": {
    "key": "missdream",
-   "views": 63,
-   "reach": 37,
+   "views": 72,
+   "reach": 44,
    "visits": null,
    "shares": 0,
    "saves": 0
@@ -422,59 +422,59 @@
   },
   "DgDctTvtaQ2": {
    "key": "goldenmoon",
-   "views": 42,
-   "reach": 21,
+   "views": 50,
+   "reach": 26,
    "visits": 0,
    "shares": 0,
    "saves": 0
   },
   "DgDdW0tN2rB": {
    "key": "goldenmoon",
-   "views": 23,
-   "reach": 19,
+   "views": 25,
+   "reach": 21,
    "visits": null,
    "shares": 0,
    "saves": 0
   },
   "DgC0fqHt8vO": {
    "key": "glamorous",
-   "views": 44,
-   "reach": 20,
+   "views": 50,
+   "reach": 22,
    "visits": 1,
    "shares": 0,
    "saves": 0
   },
   "DgCyF28jQrq": {
    "key": "vanilla",
-   "views": 118,
-   "reach": 34,
+   "views": 122,
+   "reach": 37,
    "visits": 0,
    "shares": 0,
    "saves": 0
   },
   "DgCyfJVtyri": {
    "key": "vanilla",
-   "views": 48,
-   "reach": 32,
+   "views": 50,
+   "reach": 33,
    "visits": null,
    "shares": 0,
    "saves": 0
   },
   "DgCofJZN2qs": {
    "key": "extreme",
-   "views": 70,
-   "reach": 43,
+   "views": 71,
+   "reach": 44,
    "visits": 0,
    "shares": 0,
    "saves": 1
   },
   "DgCpIegtfV2": {
    "key": "extreme",
-   "views": 156,
+   "views": 159,
    "reach": 76,
    "visits": null,
    "shares": 0,
-   "saves": 0
+   "saves": 1
   }
  }
 }
